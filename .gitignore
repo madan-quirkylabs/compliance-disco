@@ -7,3 +7,7 @@ agents/*/.hermes/
 
 # OS cruft
 .DS_Store
+
+# Large PDF-text intermediate + per-run report archive (regenerated at runtime)
+workspace/shared-data/extracted-regulations/raw.txt
+consolidated-output/*.md

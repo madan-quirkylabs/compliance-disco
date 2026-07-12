@@ -9,6 +9,9 @@
 set -uo pipefail
 cd "$(dirname "$0")"
 
+# Default to the persistent compliance profile (override by exporting HERMES_HOME)
+export HERMES_HOME="${HERMES_HOME:-$HOME/.hermes/profiles/compliance}"
+
 EXTRACTED="workspace/shared-data/extracted-regulations"
 OUT="workspace/shared-data/marketing-output"
 HANDOFFS="workspace/shared-data/handoffs"

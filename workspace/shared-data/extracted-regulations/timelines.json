@@ -1,7 +1,147 @@
-{
-  "timelines": [
-    { "event": "Breach notification to Board and affected principals", "deadline": "without delay" },
-    { "event": "Erasure after consent withdrawal / purpose completion", "deadline": "without undue delay" },
-    { "event": "Minimum log/personal-data retention", "deadline": "1 year" }
-  ]
-}
+[
+  {
+    "event": "Act receives assent of President",
+    "date": "2023-08-11",
+    "description": "The Digital Personal Data Protection Act, 2023 was enacted.",
+    "related_sections": [
+      "Section 1"
+    ]
+  },
+  {
+    "event": "Rules 1, 2 and 17 to 21 come into force",
+    "date": "2025-11-13",
+    "description": "Short title, definitions, and rules related to Chairperson/Members appointment, meetings, digital office, and appeal procedure come into force on publication.",
+    "related_sections": [
+      "Rule 1(2)"
+    ]
+  },
+  {
+    "event": "Rule 4 comes into force",
+    "date": "2026-11-13",
+    "description": "Registration and obligations of Consent Manager come into force one year after publication of Rules.",
+    "related_sections": [
+      "Rule 1(3)",
+      "Rule 4"
+    ]
+  },
+  {
+    "event": "Rules 3, 5 to 16, 22 and 23 come into force",
+    "date": "2027-05-13",
+    "description": "Majority of substantive rules (notice, security safeguards, breach notification, verifiable consent, etc.) come into force eighteen months after publication.",
+    "related_sections": [
+      "Rule 1(4)"
+    ]
+  },
+  {
+    "event": "Data Fiduciary to give notice for pre-existing consent",
+    "date": "As soon as reasonably practicable after Act commencement",
+    "description": "Data Fiduciary must provide notice to Data Principals who gave consent before Act commencement.",
+    "related_sections": [
+      "Section 5(2)"
+    ]
+  },
+  {
+    "event": "Intimation of personal data breach to Board (initial)",
+    "date": "Without delay upon becoming aware",
+    "description": "Data Fiduciary must immediately inform the Board of the breach.",
+    "related_sections": [
+      "Rule 7(2)(a)"
+    ]
+  },
+  {
+    "event": "Intimation of personal data breach to Board (detailed)",
+    "date": "Within 72 hours of becoming aware",
+    "description": "Data Fiduciary must provide updated and detailed information to the Board.",
+    "related_sections": [
+      "Rule 7(2)(b)"
+    ]
+  },
+  {
+    "event": "Intimation of personal data breach to affected Data Principals",
+    "date": "Without delay upon becoming aware",
+    "description": "Data Fiduciary must intimate each affected Data Principal.",
+    "related_sections": [
+      "Rule 7(1)"
+    ]
+  },
+  {
+    "event": "Erasure for inactive accounts (specified classes) - time period",
+    "date": "Three years from last approach or Rules commencement, whichever latest",
+    "description": "For e-commerce entities, online gaming intermediaries, and social media intermediaries with specified user thresholds, personal data must be erased after three years of inactivity unless retention required by law.",
+    "related_sections": [
+      "Third Schedule"
+    ]
+  },
+  {
+    "event": "Prior notice before erasure for inactive accounts",
+    "date": "At least 48 hours before erasure",
+    "description": "Data Fiduciary must inform Data Principal before erasure.",
+    "related_sections": [
+      "Rule 8(2)"
+    ]
+  },
+  {
+    "event": "Minimum retention of logs and personal data",
+    "date": "At least 1 year from processing date",
+    "description": "Data Fiduciary must retain personal data, traffic data, and logs for a minimum of one year.",
+    "related_sections": [
+      "Rule 8(3)"
+    ]
+  },
+  {
+    "event": "DPIA and audit for Significant Data Fiduciary",
+    "date": "Once every 12 months from date of notification as SDF",
+    "description": "Significant Data Fiduciary must undertake DPIA and audit annually.",
+    "related_sections": [
+      "Rule 13(1)"
+    ]
+  },
+  {
+    "event": "Period for grievance redressal response",
+    "date": "Within 90 days of receipt of grievance",
+    "description": "Data Fiduciary and Consent Manager must respond to grievances within 90 days.",
+    "related_sections": [
+      "Rule 14(3)"
+    ]
+  },
+  {
+    "event": "Time to file appeal to Appellate Tribunal",
+    "date": "Within 60 days from date of receipt of order or direction",
+    "description": "Any aggrieved person may file an appeal within 60 days.",
+    "related_sections": [
+      "Section 29(2)"
+    ]
+  },
+  {
+    "event": "Disposal of appeal by Appellate Tribunal",
+    "date": "Within 6 months from date of presentation",
+    "description": "Appellate Tribunal shall endeavour to dispose of appeal within six months.",
+    "related_sections": [
+      "Section 29(6)"
+    ]
+  },
+  {
+    "event": "Board inquiry completion",
+    "date": "Within 6 months from receipt of intimation/complaint/reference/direction, extendable by up to 3 months at a time",
+    "description": "Board must complete inquiry within six months, with possible extension.",
+    "related_sections": [
+      "Rule 19(9)"
+    ]
+  },
+  {
+    "event": "Central Government to notify commencement of Act provisions",
+    "date": "To be notified",
+    "description": "Different provisions may come into force on different dates as notified.",
+    "related_sections": [
+      "Section 1(2)"
+    ]
+  },
+  {
+    "event": "Central Government may exempt certain Data Fiduciaries for up to 5 years from commencement",
+    "date": "Before expiry of 5 years from commencement",
+    "description": "Central Government may declare that any provision shall not apply to certain Data Fiduciaries for a specified period.",
+    "related_sections": [
+      "Section 17(5)"
+    ]
+  }
+]

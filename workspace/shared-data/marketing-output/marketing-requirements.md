@@ -1,133 +1,196 @@
 # Marketing Compliance Requirements — DPDP Act 2023
 
-The DPDP Act 2023 introduces purpose- and consent-first obligations that fundamentally reshape how marketing collects, processes, and retains personal data across all channels. Marketing teams must transition from implied-consent / soft-opt-in practices to explicit, itemised, per-purpose consent with auditable records and transparent withdrawal mechanisms. Every customer-facing touchpoint — from signup forms and email campaigns to retargeting pixels and imported lead lists — must be audited and adapted to satisfy five core obligations (D-05, D-06, D-08, D-09, D-11). Below are the specific requirements, mapped to their originating obligation and prioritised by risk and implementation effort.
+## Summary
+
+The DPDP Act 2023 fundamentally rewrites how marketing can collect, store, and use personal data in India. Every marketing channel — promotional email, SMS, WhatsApp outreach, web signup forms, ad targeting/retargeting, analytics/tracking pixels, and purchased lead lists — must shift from implicit/soft-opt-in to a documented, affirmative-consent model with clear notice, easy withdrawal, and strict data hygiene. Existing lead databases must be re-notified. Child targeting and behavioural tracking of minors are outright banned. Marketing automation (CRMs, ESPs, ad platforms) must integrate consent lifecycle management and honour erasure requests within defined SLAs. The following requirements translate the legislative obligations into actionable engineering and process changes for the marketing team.
+
+---
 
 ## Requirements
 
-### MREQ-1: Implement itemised per-purpose consent on all web signup forms
-- **Obligation:** D-05
-- **Requirement:** All web signup, registration, and lead-capture forms must present individual checkboxes (not a blanket "I agree") for each distinct marketing purpose — e.g., promotional email, SMS offers, WhatsApp outreach, personalisation, analytics, third-party sharing. Each purpose must be accompanied by a plain-language description of what data is processed and why. Pre-ticked checkboxes are prohibited.
+### MREQ-1: Consent-Based Marketing Email — Opt-In Notice on All Promotional Emails
+- **Obligation:** OBL-002 (Notice to Data Principal)
+- **Requirement:** Every promotional email sent to a data principal must include or be preceded by a notice identifying what personal data is used, the specific purpose of the communication, how the recipient can exercise rights (access, correction, erasure), and how to complain to the DPDP Board. The notice must be independently understandable and in clear, plain language.
 - **Acceptance Criteria:**
-  - Each marketing purpose appears as a separate, un-ticked checkbox.
-  - Each checkbox has an adjacent plain-language purpose description.
-  - Consent records (purpose, timestamp, IP, user identifier) are logged to the consent DB.
-  - No blanket "Select All" on marketing purposes.
+  - All email templates audited and updated with a privacy notice footer.
+  - Notice includes: itemised data used (email, name, browsing behaviour if applicable), purpose (e.g., promotional offers), link to rights/exercise page, DPO contact, link to DPDP Board complaint portal.
+  - A/B test confirms notice does not reduce deliverability (spam score < threshold).
 - **Priority:** P0
-- **Affected channels/practices:** Web signup/consent forms
+- **Affected Channel(s):** Promotional email
 
----
-
-### MREQ-2: Enable one-click consent withdrawal accessible from every marketing message
-- **Obligation:** D-05
-- **Requirement:** Withdrawal of consent must be as easy as giving it. Every promotional email, SMS, and WhatsApp message must include a single-click/tap unsubscribe or withdrawal mechanism. Withdrawal must apply at the purpose level — e.g., the user can withdraw consent for SMS without affecting email consent, unless the user explicitly chooses to withdraw all. The withdrawal action must be recorded in the consent DB with the same granularity as the original consent.
+### MREQ-2: Rights Management & Easy Withdrawal in Email/SMS/WhatsApp
+- **Obligation:** OBL-007 (Right to Withdraw Consent)
+- **Requirement:** Every marketing communication across email, SMS, and WhatsApp must include a mechanism to withdraw consent (unsubscribe) with ease comparable to giving consent — i.e., one-click or one-reply, not requiring login or multiple steps.
 - **Acceptance Criteria:**
-  - Every promotional email includes a visible, working unsubscribe link that triggers a purpose-level withdrawal screen.
-  - Every SMS and WhatsApp promotion includes a short-code stop keyword or reply-to-stop that triggers withdrawal.
-  - Withdrawal is recorded with purpose, timestamp, and channel in the consent log.
-  - Withdrawal takes effect within 72 hours.
+  - Email: one-click unsubscribe link (List-Unsubscribe header + landing page).
+  - SMS: reply STOP/UNSUBSCRIBE keyword honoured with no additional steps.
+  - WhatsApp: opt-out via quick-reply button or "STOP" message.
+  - Withdrawal takes effect within 24 hours and is logged with timestamp for audit.
+  - No promotional messages sent after withdrawal is processed.
 - **Priority:** P0
-- **Affected channels/practices:** Promotional email, SMS, WhatsApp outreach
+- **Affected Channel(s):** Promotional email, SMS, WhatsApp outreach
 
----
-
-### MREQ-3: Purge personal data from marketing systems on consent withdrawal or purpose completion
-- **Obligation:** D-06
-- **Requirement:** When a Data Principal withdraws consent for a purpose, or the purpose for which data was collected is complete, marketing systems must erase the corresponding personal data within a defined window (72 hours for automated systems, 7 days for backups). This includes CRM records, email platform subscriber lists, WhatsApp contact lists, SMS broadcast lists, analytics profiles, and retargeting audiences. Data may be retained only if a separate legal obligation (e.g., tax record retention) applies, and such retention must be documented.
+### MREQ-3: Re-Notify All Pre-Existing Consent (Lead Database Remediation)
+- **Obligation:** OBL-003 (Notice for Pre-existing Consent)
+- **Requirement:** All contacts in the existing marketing database whose consent was obtained before DPDP Act commencement must receive a fresh notice as soon as reasonably practicable. Processing may continue only until the recipient withdraws consent. This covers all imported/purchased lead lists, legacy signups, and historical CRM contacts.
 - **Acceptance Criteria:**
-  - Automated deletion of the user from marketing-platform subscriber/contact lists on withdrawal.
-  - Removal from retargeting audiences (Facebook Custom Audiences, Google Ads lists) within 72 hours.
-  - Deletion from CRM and lead databases within 72 hours.
-  - Any data retained under separate legal obligation is tagged with the retention justification and a deletion date.
+  - Full audit of all marketing databases (Mailchimp, HubSpot, internal CRM) identifying pre-commencement contacts.
+  - Re-notification campaign sent within 60 days: email/SMS/WhatsApp depending on available channel, containing full notice (purpose, data, rights).
+  - Contacts who do not respond get a second reminder; unengaged contacts after 90 days are moved to dormant status.
+  - All re-notification sends and opt-out responses logged with timestamps.
 - **Priority:** P0
-- **Affected channels/practices:** Promotional email, SMS, WhatsApp outreach, ad targeting & retargeting, analytics/tracking pixels
+- **Affected Channel(s):** Promotional email, SMS, WhatsApp outreach, purchased/imported lead lists
 
----
-
-### MREQ-4: Mask and encrypt personal data in marketing systems and exports
-- **Obligation:** D-08
-- **Requirement:** Personal data stored in marketing platforms (email lists, CRM, analytics databases) and transmitted in marketing exports (CSV uploads, API payloads, pixel events) must be protected by encryption at rest and in transit. Fields used for personalisation (name, email, phone, location) may be reversibly encrypted; fields not required for active campaigns under valid consent must be masked or tokenised. Marketing teams must maintain an inventory of where each personal data field is stored and what protection is applied.
+### MREQ-4: Valid Consent on Web Signup/Consent Forms
+- **Obligation:** OBL-005 (Valid Consent)
+- **Requirement:** All web signup and consent forms must collect consent that is free, specific, informed, unconditional, unambiguous, and via a clear affirmative action (opt-in, not pre-checked). Consent must be limited to personal data that is necessary for the stated marketing purpose.
 - **Acceptance Criteria:**
-  - All marketing-platform APIs use TLS 1.2+ for data in transit.
-  - Personally identifiable data in marketing databases is encrypted at rest (AES-256 or equivalent).
-  - CSV exports for ad-platform uploads use masked/hashed identifiers where possible (e.g., SHA-256 hashed email for Custom Audiences).
-  - An inventory of personal data locations and encryption status is maintained and reviewed quarterly.
+  - No pre-checked consent boxes — all opt-ins require explicit user action (tick, toggle, button click).
+  - Separate checkboxes for different purposes (promotional email, SMS, WhatsApp, analytics, personalised ads).
+  - Consent is bundled only with the marketing purpose — not buried in terms of service or mandatory for unrelated services.
+  - Consent record stored with: timestamp, IP, user agent, exact consent text shown, version of consent form.
+  - Form does not allow submission without at least one explicit affirmative action (but user can decline all marketing).
+- **Priority:** P0
+- **Affected Channel(s):** Web signup/consent forms
+
+### MREQ-5: Notice in Clear Plain Language with Language Options
+- **Obligation:** OBL-006 (Clear Language for Consent Request), OBL-004 (Option for Language of Notice)
+- **Requirement:** All consent requests and privacy notices in marketing channels must be in clear and plain language, not legalese. The data principal must have the option to access the notice in English or any language in the Eighth Schedule to the Indian Constitution (22 official languages).
+- **Acceptance Criteria:**
+  - All consent copy and privacy notices reviewed and rewritten in plain language (Flesch-Kincaid Grade 6 or below / B1 CEFR level).
+  - Language selector prominently available on web consent forms for at least English + Hindi + top 5 Eighth Schedule languages based on audience composition.
+  - Email/SMS/WhatsApp notices include a link to the language selection page.
+  - Translation accuracy verified by native speakers or professional translation service.
 - **Priority:** P1
-- **Affected channels/practices:** Promotional email, ad targeting & retargeting, analytics/tracking pixels, purchased/imported lead lists
+- **Affected Channel(s):** Web signup/consent forms, Promotional email, SMS, WhatsApp outreach
 
----
-
-### MREQ-5: Detect and report breaches involving marketing data
-- **Obligation:** D-09
-- **Requirement:** Marketing systems that handle personal data (email platforms, CRM, analytics, ad platforms) must be covered by the organisation's breach detection and notification pipeline. Marketing must designate a point of contact to receive breach alerts and must maintain documented escalation procedures to the Data Protection Officer within 24 hours of confirmed or suspected breach involving marketing data. Breaches include unauthorised access to subscriber lists, export of customer data by a compromised marketing tool, or exposure of personalisation profiles through an analytics pixel.
+### MREQ-6: Consent Lifecycle Integration (CRM/ESP/Ad Platforms)
+- **Obligation:** OBL-008 (Cessation of Processing on Withdrawal), OBL-010 (Burden of Proof for Consent)
+- **Requirement:** Marketing automation platforms (CRM, email service provider, WhatsApp Business API, ad platforms) must be integrated with the central consent management system. Consent withdrawal, erasure, and preference changes must propagate to every downstream system. The burden of proof is on the data fiduciary — every consent record must be stored and retrievable for regulatory proceedings.
 - **Acceptance Criteria:**
-  - Marketing channels have documented escalation paths to the DPO.
-  - A designated marketing security contact is appointed and trained.
-  - Breach notification template (Data Principal facing) is drafted and approved for marketing use cases.
-  - Tabletop exercise is conducted quarterly covering a simulated marketing data breach.
-- **Priority:** P1
-- **Affected channels/practices:** Promotional email, SMS, WhatsApp outreach, analytics/tracking pixels, purchased/imported lead lists
-
----
-
-### MREQ-6: Retain marketing logs and consent records for at least one year
-- **Obligation:** D-11
-- **Requirement:** Consent records, withdrawal records, marketing campaign logs, and personal data processing logs must be retained for a minimum of one year from the date of creation, or longer if a legal or regulatory requirement mandates it. Logs must be immutable (append-only) and time-stamped. After the retention period, logs that do not serve a separate legal purpose must be erased or anonymised.
-- **Acceptance Criteria:**
-  - Consent DB records are retained for at least 366 days post-withdrawal or post-purpose-completion.
-  - Campaign send logs (email/SMS/WhatsApp dispatch records) are retained for at least one year.
-  - Logs are stored in an append-only format (e.g., database with insert-only permissions).
-  - Automated deletion or archival is triggered after the retention period expires.
-  - Retention policy is documented and auditable.
-- **Priority:** P1
-- **Affected channels/practices:** Promotional email, SMS, WhatsApp outreach, web signup/consent forms
-
----
-
-### MREQ-7: Discontinue use of purchased or imported lead lists without documented valid consent
-- **Obligation:** D-05, D-06
-- **Requirement:** Marketing must not use purchased, rented, or imported lead lists for any outbound communication (email, SMS, WhatsApp, phone) unless each lead on the list has provided documented, itemised consent that meets DPDP Act standards specifically for the intended communication channel. Lists for which valid consent cannot be demonstrated must be erased or segregated into a "no-consent" quarantine database that is never used for outreach. New lead imports must pass a consent-validity gate before entering any active campaign list.
-- **Acceptance Criteria:**
-  - Inventory of all purchased/imported lead lists is created with source, date, and consent status.
-  - Lists without verifiable per-purpose consent are quarantined and blocked from campaign systems.
-  - A consent-validity gate is implemented in the lead import pipeline.
-  - Quarantined data is erased within 7 days unless covered by a documented legal retention exemption.
+  - Webhook-based or API-based consent sync from central consent store to all marketing platforms (email ESP, SMS gateway, WhatsApp Business API, ad platforms, analytics tools).
+  - Withdrawal on any channel is propagated to all other channels within 24 hours.
+  - Consent records stored immutably with: timestamp, IP, user agent, consent text, version, channel of origination, channel(s) of propagation.
+  - Quarterly audit export is produced and retained for a minimum of 7 years.
+  - Integration tested with all active marketing platforms (list provided by eng team).
 - **Priority:** P0
-- **Affected channels/practices:** Purchased/imported lead lists
+- **Affected Channel(s):** Promotional email, SMS, WhatsApp outreach, ad targeting & retargeting, analytics/tracking pixels
 
----
-
-### MREQ-8: Apply security safeguards to analytics and tracking pixel data
-- **Obligation:** D-08
-- **Requirement:** Analytics scripts and tracking pixels that collect personal data (email, phone, hashed identifiers, device IDs) must transmit data via encrypted channels. PII transmitted to third-party analytics/ad platforms must be minimised to only what is necessary under the specific consent obtained. Where possible, use server-side tracking or first-party cookie alternatives instead of third-party pixels that expose personal data to uncontrolled downstream processing.
+### MREQ-7: Complete Block on Child Targeting — No Tracking or Behavioural Ads for Minors
+- **Obligation:** OBL-024 (Restrictions on Child's Data Processing)
+- **Requirement:** Marketing must not undertake tracking, behavioural monitoring, or targeted advertising directed at children. This covers all channels: ad platforms (Google Ads, Meta, programmatic), tracking pixels, analytics, retargeting, and email/SMS/WhatsApp outreach to known minors.
 - **Acceptance Criteria:**
-  - All analytics and pixel calls use HTTPS (TLS 1.2+).
-  - Data minimisation review is completed: only fields with documented consent are passed to each analytics/ad platform.
-  - A migration plan for server-side / first-party tracking is drafted and approved.
+  - Age-gate mechanism on all signup forms: mandatory date-of-birth or age declaration before marketing communications can be enabled.
+  - Ad platform audiences and campaign settings updated to exclude age < 18 targeting anywhere in India.
+  - No retargeting pixels fire on pages where user has declared or is reasonably inferred to be a minor.
+  - Analytics dashboards filter out or aggregate data from known minors (no individual profiling).
+  - Existing marketing databases scrubbed: any contact known to be under 18 is moved to a restricted segment with no promotional outreach.
+  - Parental consent flow (per OBL-022/OBL-044) implemented for services where child data is collected for non-marketing purposes.
+- **Priority:** P0
+- **Affected Channel(s):** Ad targeting & retargeting, analytics/tracking pixels, Web signup/consent forms, Promotional email, SMS, WhatsApp outreach
+
+### MREQ-8: Erasure Pipeline — Delete Marketing Data on Request or Withdrawal
+- **Obligation:** OBL-018 (Erasure of Personal Data), OBL-030 (Erasure upon Request), OBL-008 (Cessation of Processing on Withdrawal)
+- **Requirement:** Marketing systems must erase a data principal's personal data upon withdrawal of consent, or upon request via rights exercise, unless retention is required by law. Erasure must also be triggered for inactive accounts after the prescribed period (3 years per Third Schedule).
+- **Acceptance Criteria:**
+  - Erasure request (via rights page, email, or consent withdrawal) triggers deletion from all marketing databases (CRM, ESP, SMS gateway, WhatsApp, ad platform audiences, analytics) within 7 business days.
+  - Deletion is logged with timestamp and a confirmation sent to the data principal.
+  - Inactive account erasure policy implemented: accounts with no login and no rights exercise within 3 years are flagged, given 48-hour notice per OBL-041, then erased.
+  - Erasure confirmation from each downstream system verified — no zombie records retained in backups that are restored into production.
+- **Priority:** P1
+- **Affected Channel(s):** Promotional email, SMS, WhatsApp outreach, ad targeting & retargeting, analytics/tracking pixels, purchased/imported lead lists
+
+### MREQ-9: Accuracy Completeness of Purchased/Imported Lead Lists
+- **Obligation:** OBL-014 (Completeness, Accuracy and Consistency)
+- **Requirement:** If personal data from purchased or imported lead lists is used for marketing outreach (which itself requires a lawful basis), the data fiduciary must ensure the data is complete, accurate, and consistent before any marketing decision or disclosure is made based on it.
+- **Acceptance Criteria:**
+  - No purchased/imported lead list is used for marketing unless consent for that specific purpose can be verified.
+  - Lead lists from third-party sources are validated against the consent requirements: each lead must have provable consent (source, timestamp, consent text) from the original collection point, or must go through the re-notification process (MREQ-3).
+  - Data quality checks run on all imported lists: phone number format validation, email format validation, deduplication against existing DNC/unsubscribe lists.
+  - Inaccurate data (invalid emails, wrong names, bounced contacts) is corrected or removed within 30 days.
+  - Monthly data quality report generated showing accuracy rate per lead source.
+- **Priority:** P1
+- **Affected Channel(s):** Purchased/imported lead lists, SMS, WhatsApp outreach, Promotional email
+
+### MREQ-10: Grievance Redressal & DPO Contact Published on Marketing Touchpoints
+- **Obligation:** OBL-020 (Publishing Contact Information), OBL-021 (Grievance Redressal Mechanism), OBL-043 (Publishing Contact Information of DPO - Rule 9)
+- **Requirement:** Marketing channels that are public-facing (website, promotional emails, SMS, WhatsApp) must prominently display the business contact information of the Data Protection Officer (or person able to answer questions about processing). An effective grievance redressal mechanism must be established and publicised, with responses within 90 days.
+- **Acceptance Criteria:**
+  - DPO contact (email/phone) and grievance portal link included on:
+    - Website footer of all marketing landing pages.
+    - Privacy/consent notice in promotional emails.
+    - SMS and WhatsApp automated reply for "HELP" or grievance keywords.
+  - Grievance portal accepts complaints via web form, email, and WhatsApp.
+  - Auto-acknowledgement sent within 24 hours; substantive response within 90 days per Rule 14(3).
+  - Monthly grievance dashboard showing: count, category, resolution time, escalation status.
+- **Priority:** P1
+- **Affected Channel(s):** Web signup/consent forms, Promotional email, SMS, WhatsApp outreach
+
+### MREQ-11: Ad-Targeting Opt-Out Sync — Honour Consent Withdrawal on Ad Platforms
+- **Obligation:** OBL-007 (Right to Withdraw Consent), OBL-008 (Cessation of Processing on Withdrawal)
+- **Requirement:** When a user withdraws consent for marketing personalisation or retargeting, the opt-out must propagate to ad platforms (Google Ads, Meta, LinkedIn, programmatic DSPs) to cease targeting and audience inclusion.
+- **Acceptance Criteria:**
+  - Consent withdrawal for ad personalisation triggers removal from all ad-platform customer-match audiences within 24 hours.
+  - User is added to suppression/exclusion lists on all active ad platforms.
+  - Automated check: weekly audit of audiences vs consent database to detect and correct stale inclusions.
+  - No retargeting cookies/pixels fire for opted-out users (verified via browser testing).
+  - Process documented for manual ad-platform exclusion for platforms without API access.
+- **Priority:** P1
+- **Affected Channel(s):** Ad targeting & retargeting, analytics/tracking pixels
+
+### MREQ-12: Notice on Every Consent Request — Itemised Data and Purpose
+- **Obligation:** OBL-035 (Rule 3 - Notice Content and Presentation)
+- **Requirement:** Every consent request on marketing channels must be accompanied by an independently understandable notice that itemises each personal data element collected and each specific purpose, and provides a communication link for withdrawal, rights exercise, and complaints.
+- **Acceptance Criteria:**
+  - Web consent forms show a layered notice: brief summary + expandable detail for each data-purpose pair.
+  - Consent flow cannot be completed without the notice being displayed (not hidden behind a link).
+  - Notice includes direct communication link (URL or shortcode) for withdrawal, rights, and DPDP Board complaints.
+  - SMS/WhatsApp consent notices are within the message body (not a link-only notice) with the link for further detail.
+  - Notice template reviewed and approved by legal/compliance team.
+- **Priority:** P0
+- **Affected Channel(s):** Web signup/consent forms, Promotional email, SMS, WhatsApp outreach
+
+### MREQ-13: Breach Notification — Marketing Channels as Contact Vector
+- **Obligation:** OBL-017 (Intimation of Personal Data Breach), OBL-039 (Rule 7 - Detailed Process)
+- **Requirement:** In the event of a personal data breach involving marketing data, the marketing department must support breach notification by providing the contact channels (email, SMS, WhatsApp) and contact data for affected data principals. Notification must be dispatched without delay.
+- **Acceptance Criteria:**
+  - Incident response runbook includes marketing data contact extraction procedure.
+  - Marketing automation systems can produce an affected-user contact list (email, phone, WhatsApp) within 4 hours of a verified breach.
+  - Notification template pre-approved for email/SMS/WhatsApp channels containing: description, consequences, measures taken, safety steps for user, and DPO contact.
+  - Marketing systems retain traffic and processing logs for at least 1 year per OBL-042 to support breach investigation.
 - **Priority:** P2
-- **Affected channels/practices:** Analytics/tracking pixels, ad targeting & retargeting
+- **Affected Channel(s):** Promotional email, SMS, WhatsApp outreach, analytics/tracking pixels, purchased/imported lead lists
 
----
-
-### MREQ-9: Obtain explicit consent before using personal data for ad retargeting
-- **Obligation:** D-05
-- **Requirement:** Ad retargeting (displaying ads to users based on their prior interactions with the website/app) constitutes a distinct processing purpose requiring separate, itemised consent. Users must be able to decline retargeting while retaining consent for other marketing purposes (e.g., transactional emails). The consent mechanism for retargeting must be presented at the same time as other marketing consents, not buried in a third-party cookie banner separate from the main consent flow. Retargeting lists (Custom Audiences, remarketing tags) must exclude users who have not given explicit retargeting consent.
+### MREQ-14: Verifiable Parental Consent Flow for Child-Accessible Services
+- **Obligation:** OBL-022 (Verifiable Consent for Child's Data), OBL-044 (Rule 10 - Due Diligence)
+- **Requirement:** For any marketing-adjacent service that is accessible to minors and collects personal data (e.g., loyalty programme, newsletter, content gating), the signup flow must include verifiable parental consent. The marketing team must ensure no promotional processing occurs without verified parental consent for users under 18.
 - **Acceptance Criteria:**
-  - A separate consent checkbox for "personalised ads / retargeting" exists on the signup form.
-  - Retargeting pixels fire only when retargeting consent is present.
-  - Retargeting lists are purged of users whose retargeting consent has been withdrawn.
-  - Sync with ad platforms (Facebook, Google, LinkedIn) only includes consent-positive users.
-- **Priority:** P0
-- **Affected channels/practices:** Ad targeting & retargeting, web signup/consent forms
+  - Age verification gate at point of data collection: if user indicates age < 18, flow redirects to parental consent.
+  - Parental consent flow collects parent's verifiable identity details and explicit consent for the child's data processing.
+  - Parent can withdraw consent on behalf of the child.
+  - No marketing/promotional emails, SMS, WhatsApp, or personalised ads are sent to users whose parental consent is not verified.
+  - Due diligence measures (per Rule 10) implemented to verify parent is an identifiable adult.
+- **Priority:** P2
+- **Affected Channel(s):** Web signup/consent forms, Promotional email, SMS, WhatsApp outreach, ad targeting & retargeting
 
----
-
-### MREQ-10: Maintain consent records synchronised across all marketing platforms
-- **Obligation:** D-05, D-06, D-11
-- **Requirement:** Consent state must be authoritative in a central consent-management platform (CMP) and synchronised to all downstream marketing platforms (email service provider, SMS gateway, WhatsApp Business API, CRM, ad platforms, analytics). No marketing platform may act on stale or absent consent data. Synchronisation must include: consent grant, consent withdrawal, purpose change, and data erasure requests. Sync latency must not exceed 4 hours.
+### MREQ-15: Accuracy Correction Pipeline for Marketing Data
+- **Obligation:** OBL-029 (Correction, Completion, Updating)
+- **Requirement:** Data principals have the right to request correction, completion, or updating of their personal data. Marketing systems must support these rights — users must be able to correct their email, phone, name, and preferences via a self-service portal or request mechanism.
 - **Acceptance Criteria:**
-  - A single source-of-truth CMP is deployed and integrated.
-  - All marketing platforms receive consent state updates within 4 hours.
-  - A reconciliation audit between CMP and each marketing platform is run weekly.
-  - Scheduled sends and ad campaigns respect consent updates within the 4-hour window.
-- **Priority:** P1
-- **Affected channels/practices:** Promotional email, SMS, WhatsApp outreach, ad targeting & retargeting
+  - Self-service preference centre allows users to update: email, phone, name, communication preferences, language.
+  - Updates propagate to all downstream marketing platforms within 48 hours.
+  - Correction request via email/SMS is processed within 7 business days.
+  - Audit log maintained of all correction requests and their resolution.
+- **Priority:** P2
+- **Affected Channel(s):** Web signup/consent forms, Promotional email, SMS, WhatsApp outreach, purchased/imported lead lists
+
+### MREQ-16: Consent Manager Interoperability
+- **Obligation:** OBL-009 (Consent Manager)
+- **Requirement:** Marketing consent infrastructure must support the Consent Manager model — data principals must be able to give, manage, review, or withdraw consent through a registered Consent Manager. Marketing systems must accept and honour consent signals from registered Consent Managers.
+- **Acceptance Criteria:**
+  - Marketing consent APIs documented to support Consent Manager integration.
+  - When a user withdraws consent via a Consent Manager, the withdrawal is honoured in all marketing systems within 24 hours.
+  - No marketing processing occurs for users where the Consent Manager signals no consent.
+  - Integration with at least one registered Consent Manager tested in staging before go-live.
+- **Priority:** P2
+- **Affected Channel(s):** Web signup/consent forms, Promotional email, SMS, WhatsApp outreach, ad targeting & retargeting, analytics/tracking pixels

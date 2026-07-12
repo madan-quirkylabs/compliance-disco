@@ -13,6 +13,9 @@
 set -uo pipefail
 cd "$(dirname "$0")"
 
+# Default to the persistent compliance profile (override by exporting HERMES_HOME)
+export HERMES_HOME="${HERMES_HOME:-$HOME/.hermes/profiles/compliance}"
+
 echo "━━━ 1/3  Engineering requirements ━━━"
 ./run_engineering.sh  || echo "  (engineering step returned nonzero — continuing)"
 
