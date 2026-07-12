@@ -161,7 +161,3 @@ python3 test_pipeline.py --clean --test-failures
 - API key (OpenAI, Anthropic, or OpenRouter)
 - Docker
 - Python 3.11+
-
-## License
-
-MIT — Hermes Buildathon 2026.
