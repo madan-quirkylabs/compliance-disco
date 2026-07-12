@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compliance-Disco — Compliance Dashboard</title>
+  <title>Compliance-Disco — Live Dashboard</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #e0e0e0; line-height: 1.6; }
@@ -18,6 +18,8 @@
     .status-card .value { font-size: 1.5rem; font-weight: 700; color: #fff; margin-top: 0.25rem; }
     .status-card .value.green { color: #4ade80; }
     .status-card .value.yellow { color: #facc15; }
+    .status-card .value.red { color: #f87171; }
+    .status-card .value.blue { color: #60a5fa; }
     .report { background: #111; border: 1px solid #222; border-radius: 8px; padding: 2rem; margin: 2rem 0; }
     .report h2 { font-size: 1.25rem; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
     .report h3 { font-size: 1rem; color: #ccc; margin: 1.5rem 0 0.5rem; }
@@ -25,19 +27,30 @@
     .report ul { margin: 0.5rem 0 1rem 1.5rem; color: #aaa; }
     .report li { margin-bottom: 0.4rem; }
     .report strong { color: #fff; }
-    .report table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-    .report th, .report td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #222; font-size: 0.875rem; }
-    .report th { color: #888; font-weight: 600; }
-    .report td { color: #ccc; }
     .pipeline { margin: 2rem 0; }
     .pipeline h2 { font-size: 1.25rem; color: #fff; margin-bottom: 1rem; }
     .step { display: flex; align-items: center; margin-bottom: 0.75rem; }
     .step-num { width: 28px; height: 28px; background: #1a4d2e; color: #4ade80; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+    .step-num.running { background: #1a3d4d; color: #60a5fa; animation: pulse 1.5s infinite; }
+    .step-num.failed { background: #4d1a1a; color: #f87171; }
     .step-text { margin-left: 0.75rem; color: #ccc; font-size: 0.875rem; }
     .step-text strong { color: #fff; }
+    .step-status { margin-left: auto; font-size: 0.75rem; color: #888; }
+    .step-status.ok { color: #4ade80; }
+    .step-status.running { color: #60a5fa; }
+    .step-status.failed { color: #f87171; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .btn { display: inline-block; background: #1a4d2e; color: #4ade80; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn:hover { background: #2a6d3e; }
+    .btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+    .btn.danger { background: #4d1a1a; color: #f87171; }
+    .btn.danger:hover { background: #5d2a2a; }
+    .controls { text-align: center; margin: 2rem 0; }
+    .error { background: #2d1b1b; border: 1px solid #5c2020; border-radius: 8px; padding: 1rem; margin: 1rem 0; color: #f87171; }
+    .success { background: #1b2d1b; border: 1px solid #205c20; border-radius: 8px; padding: 1rem; margin: 1rem 0; color: #4ade80; }
     footer { text-align: center; padding: 2rem 0; color: #555; font-size: 0.75rem; border-top: 1px solid #222; margin-top: 2rem; }
     #loading { text-align: center; padding: 4rem; color: #888; }
-    .error { background: #2d1b1b; border: 1px solid #5c2020; border-radius: 8px; padding: 1rem; margin: 1rem 0; color: #f87171; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 4px; overflow-x: auto; color: #4ade80; font-size: 0.8rem; }
   </style>
 </head>
 <body>
@@ -51,7 +64,7 @@
     <div class="status-grid">
       <div class="status-card">
         <div class="label">Pipeline Status</div>
-        <div class="value green" id="pipeline-status">—</div>
+        <div class="value" id="pipeline-status">—</div>
       </div>
       <div class="status-card">
         <div class="label">Regulation</div>
@@ -67,14 +80,23 @@
       </div>
     </div>
 
+    <div class="controls">
+      <button class="btn" id="run-btn" onclick="runPipeline()">Run Pipeline</button>
+      <button class="btn" onclick="refreshStatus()">Refresh Status</button>
+    </div>
+
+    <div id="message-box"></div>
+
     <div class="pipeline">
       <h2>Pipeline Stages</h2>
-      <div class="step"><div class="step-num">0</div><div class="step-text"><strong>Monitor</strong> — Watches SEBI, AMFI, RBI for new publications</div></div>
-      <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Reader</strong> — Extracts obligations, definitions, timelines, penalties</div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Coordinator</strong> — Validates, dispatches to Marketing + Engineering in parallel</div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Marketing</strong> — Guides, checklists, FAQs, blog content</div></div>
-      <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Engineering</strong> — Data schemas, control architecture, implementation guide</div></div>
-      <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Consolidator</strong> — Merges all outputs into final compliance report</div></div>
+      <div id="pipeline-stages">
+        <div class="step"><div class="step-num">0</div><div class="step-text"><strong>Monitor</strong> — Watches regulatory sources</div><div class="step-status">ready</div></div>
+        <div class="step"><div class="step-num">1</div><div class="step-text"><strong>PDF to Text</strong> — Converts PDFs to plain text</div><div class="step-status">ready</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Extraction</strong> — Extracts obligations, definitions, timelines, penalties</div><div class="step-status">ready</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Marketing</strong> — Guides, checklists, FAQs, blog content</div><div class="step-status">ready</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Engineering</strong> — Data schemas, control architecture, implementation guide</div><div class="step-status">ready</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Consolidation</strong> — Merges all outputs into final compliance report</div><div class="step-status">ready</div></div>
+      </div>
     </div>
 
     <div class="report" id="report-section">
@@ -89,73 +111,145 @@
   </div>
 
   <script>
-    // Try to load the report from the expected path
-    // In production, this would be served by the gateway or a static file server
-    async function loadReport() {
-      const reportPaths = [
-        'workspace/shared-data/consolidated-output/final-report.md',
-        '../workspace/shared-data/consolidated-output/final-report.md',
-        'final-report.md'
-      ];
+    const API_BASE = window.location.origin;
 
-      for (const path of reportPaths) {
+    async function runPipeline() {
+      const btn = document.getElementById('run-btn');
+      btn.disabled = true;
+      btn.textContent = 'Running...';
+      showMessage('Pipeline started. This may take a few minutes...', 'info');
+
+      try {
+        const resp = await fetch(`${API_BASE}/api/run`, { method: 'POST' });
+        const data = await resp.json();
+
+        if (resp.ok) {
+          showMessage('Pipeline is running. Refreshing status...', 'success');
+          pollStatus();
+        } else {
+          showMessage(data.detail || 'Failed to start pipeline', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Run Pipeline';
+        }
+      } catch (e) {
+        showMessage('Failed to connect to server', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Run Pipeline';
+      }
+    }
+
+    async function pollStatus() {
+      const btn = document.getElementById('run-btn');
+
+      const interval = setInterval(async () => {
         try {
-          const resp = await fetch(path);
-          if (resp.ok) {
-            const text = await resp.text();
-            renderReport(text);
-            return;
+          const resp = await fetch(`${API_BASE}/api/status`);
+          const data = await resp.json();
+
+          updateStatusDisplay(data);
+
+          if (data.pipeline.status === 'complete') {
+            clearInterval(interval);
+            btn.disabled = false;
+            btn.textContent = 'Run Pipeline';
+            showMessage('Pipeline complete!', 'success');
+            loadReport();
+          } else if (data.pipeline.status === 'failed') {
+            clearInterval(interval);
+            btn.disabled = false;
+            btn.textContent = 'Run Pipeline';
+            showMessage(`Pipeline failed: ${data.pipeline.error}`, 'error');
           }
-        } catch (e) { /* try next path */ }
-      }
-
-      // No report found — show demo content
-      renderDemoReport();
+        } catch (e) {
+          // Keep polling
+        }
+      }, 3000);
     }
 
-    function renderReport(markdown) {
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('report-content').style.display = 'block';
-      document.getElementById('report-content').innerHTML = markdownToHtml(markdown);
-      document.getElementById('pipeline-status').textContent = 'Complete';
+    async function refreshStatus() {
+      try {
+        const resp = await fetch(`${API_BASE}/api/status`);
+        const data = await resp.json();
+        updateStatusDisplay(data);
 
-      // Extract regulation name from first heading
-      const match = markdown.match(/^#\s+(.+)/m);
-      if (match) {
-        document.getElementById('regulation-name').textContent = match[1].replace(/Compliance Report.*$/, '').trim();
+        if (data.pipeline.status === 'complete') {
+          loadReport();
+        }
+      } catch (e) {
+        showMessage('Failed to fetch status', 'error');
       }
-
-      // Count obligations
-      const obsMatch = markdown.match(/(\d+)\s+obligation/i);
-      if (obsMatch) {
-        document.getElementById('obligation-count').textContent = obsMatch[1];
-      }
-
-      // Last run
-      document.getElementById('last-run').textContent = new Date().toLocaleDateString();
     }
 
-    function renderDemoReport() {
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('report-content').style.display = 'block';
-      document.getElementById('pipeline-status').textContent = 'Demo';
-      document.getElementById('regulation-name').textContent = 'DPDP Act 2023';
-      document.getElementById('obligation-count').textContent = '10';
-      document.getElementById('last-run').textContent = new Date().toLocaleDateString();
+    function updateStatusDisplay(data) {
+      const statusEl = document.getElementById('pipeline-status');
+      const regEl = document.getElementById('regulation-name');
+      const obsEl = document.getElementById('obligation-count');
+      const lastEl = document.getElementById('last-run');
 
-      document.getElementById('report-content').innerHTML = `
-        <h3>Demo Mode</h3>
-        <p>This is a preview. To see the full report, run the pipeline:</p>
-        <pre style="background:#1a1a1a;padding:1rem;border-radius:4px;overflow-x:auto;color:#4ade80;font-size:0.8rem;">python3 test_pipeline.py --clean</pre>
-        <p>Then refresh this page.</p>
-        <h3>What Compliance-Disco Does</h3>
-        <ul>
-          <li><strong>Monitors</strong> regulatory bodies (SEBI, AMFI, RBI) for new publications</li>
-          <li><strong>Extracts</strong> structured obligations, timelines, and penalties</li>
-          <li><strong>Analyzes</strong> impact from marketing and engineering perspectives</li>
-          <li><strong>Delivers</strong> a unified compliance report with actionable next steps</li>
-        </ul>
-      `;
+      const status = data.pipeline.status;
+      statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+      statusEl.className = 'value ' + (
+        status === 'complete' ? 'green' :
+        status === 'running' ? 'blue' :
+        status === 'failed' ? 'red' : ''
+      );
+
+      if (data.pipeline.regulation) {
+        regEl.textContent = data.pipeline.regulation;
+      }
+
+      if (data.report) {
+        obsEl.textContent = data.report.obligations;
+        lastEl.textContent = new Date(data.report.last_modified).toLocaleDateString();
+      }
+
+      updatePipelineStages(data.pipeline.stages || []);
+    }
+
+    function updatePipelineStages(stages) {
+      const container = document.getElementById('pipeline-stages');
+      const stageNames = ['Monitor', 'PDF to Text', 'Extraction', 'Marketing', 'Engineering', 'Consolidation'];
+
+      const html = stageNames.map((name, i) => {
+        const stage = stages.find(s => s.name === name.toLowerCase().replace(/\s+/g, ''));
+        const status = stage ? stage.status : 'ready';
+        const statusClass = status === 'ok' ? 'ok' : status === 'running' ? 'running' : status === 'failed' ? 'failed' : '';
+        const numClass = status === 'running' ? 'running' : status === 'failed' ? 'failed' : '';
+
+        return `
+          <div class="step">
+            <div class="step-num ${numClass}">${i}</div>
+            <div class="step-text"><strong>${name}</strong></div>
+            <div class="step-status ${statusClass}">${status}</div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = html;
+    }
+
+    async function loadReport() {
+      try {
+        const resp = await fetch(`${API_BASE}/api/report`);
+        const data = await resp.json();
+
+        if (resp.ok) {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('report-content').style.display = 'block';
+          document.getElementById('report-content').innerHTML = markdownToHtml(data.report);
+        }
+      } catch (e) {
+        document.getElementById('loading').textContent = 'No report available. Run the pipeline to generate one.';
+      }
+    }
+
+    function showMessage(text, type) {
+      const box = document.getElementById('message-box');
+      const cls = type === 'error' ? 'error' : 'success';
+      box.innerHTML = `<div class="${cls}">${text}</div>`;
+      if (type !== 'error') {
+        setTimeout(() => { box.innerHTML = ''; }, 5000);
+      }
     }
 
     function markdownToHtml(md) {
@@ -170,12 +264,11 @@
         .replace(/\|(.+)\|/g, (match) => {
           const cells = match.split('|').filter(c => c.trim());
           if (cells.some(c => c.trim().match(/^[-]+$/))) return '';
-          const tag = match.includes('---') ? 'th' : 'td';
-          return '<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>';
+          return '<tr>' + cells.map(c => `<td>${c.trim()}</td>`).join('') + '</tr>';
         });
     }
 
-    loadReport();
+    refreshStatus();
   </script>
 </body>
 </html>
