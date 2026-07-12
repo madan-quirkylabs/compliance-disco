@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compliance-Disco — Compliance Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #e0e0e0; line-height: 1.6; }
+    .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+    header { text-align: center; padding: 3rem 0 2rem; border-bottom: 1px solid #222; margin-bottom: 2rem; }
+    h1 { font-size: 2rem; font-weight: 700; color: #fff; }
+    .subtitle { color: #888; margin-top: 0.5rem; }
+    .badge { display: inline-block; background: #1a4d2e; color: #4ade80; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; margin-top: 1rem; }
+    .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 2rem 0; }
+    .status-card { background: #111; border: 1px solid #222; border-radius: 8px; padding: 1rem; text-align: center; }
+    .status-card .label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+    .status-card .value { font-size: 1.5rem; font-weight: 700; color: #fff; margin-top: 0.25rem; }
+    .status-card .value.green { color: #4ade80; }
+    .status-card .value.yellow { color: #facc15; }
+    .report { background: #111; border: 1px solid #222; border-radius: 8px; padding: 2rem; margin: 2rem 0; }
+    .report h2 { font-size: 1.25rem; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+    .report h3 { font-size: 1rem; color: #ccc; margin: 1.5rem 0 0.5rem; }
+    .report p { color: #aaa; margin-bottom: 0.75rem; }
+    .report ul { margin: 0.5rem 0 1rem 1.5rem; color: #aaa; }
+    .report li { margin-bottom: 0.4rem; }
+    .report strong { color: #fff; }
+    .report table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .report th, .report td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #222; font-size: 0.875rem; }
+    .report th { color: #888; font-weight: 600; }
+    .report td { color: #ccc; }
+    .pipeline { margin: 2rem 0; }
+    .pipeline h2 { font-size: 1.25rem; color: #fff; margin-bottom: 1rem; }
+    .step { display: flex; align-items: center; margin-bottom: 0.75rem; }
+    .step-num { width: 28px; height: 28px; background: #1a4d2e; color: #4ade80; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+    .step-text { margin-left: 0.75rem; color: #ccc; font-size: 0.875rem; }
+    .step-text strong { color: #fff; }
+    footer { text-align: center; padding: 2rem 0; color: #555; font-size: 0.75rem; border-top: 1px solid #222; margin-top: 2rem; }
+    #loading { text-align: center; padding: 4rem; color: #888; }
+    .error { background: #2d1b1b; border: 1px solid #5c2020; border-radius: 8px; padding: 1rem; margin: 1rem 0; color: #f87171; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Compliance-Disco</h1>
+      <div class="subtitle">Automated Regulatory Compliance Monitoring & Analysis</div>
+      <div class="badge">Hermes Buildathon 2026</div>
+    </header>
+
+    <div class="status-grid">
+      <div class="status-card">
+        <div class="label">Pipeline Status</div>
+        <div class="value green" id="pipeline-status">—</div>
+      </div>
+      <div class="status-card">
+        <div class="label">Regulation</div>
+        <div class="value" id="regulation-name">—</div>
+      </div>
+      <div class="status-card">
+        <div class="label">Obligations</div>
+        <div class="value" id="obligation-count">—</div>
+      </div>
+      <div class="status-card">
+        <div class="label">Last Run</div>
+        <div class="value" id="last-run">—</div>
+      </div>
+    </div>
+
+    <div class="pipeline">
+      <h2>Pipeline Stages</h2>
+      <div class="step"><div class="step-num">0</div><div class="step-text"><strong>Monitor</strong> — Watches SEBI, AMFI, RBI for new publications</div></div>
+      <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Reader</strong> — Extracts obligations, definitions, timelines, penalties</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Coordinator</strong> — Validates, dispatches to Marketing + Engineering in parallel</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Marketing</strong> — Guides, checklists, FAQs, blog content</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Engineering</strong> — Data schemas, control architecture, implementation guide</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Consolidator</strong> — Merges all outputs into final compliance report</div></div>
+    </div>
+
+    <div class="report" id="report-section">
+      <h2>Compliance Report</h2>
+      <div id="loading">Loading report...</div>
+      <div id="report-content" style="display:none;"></div>
+    </div>
+
+    <footer>
+      Compliance-Disco — Built on Hermes Agent — Hermes Buildathon 2026
+    </footer>
+  </div>
+
+  <script>
+    // Try to load the report from the expected path
+    // In production, this would be served by the gateway or a static file server
+    async function loadReport() {
+      const reportPaths = [
+        'workspace/shared-data/consolidated-output/final-report.md',
+        '../workspace/shared-data/consolidated-output/final-report.md',
+        'final-report.md'
+      ];
+
+      for (const path of reportPaths) {
+        try {
+          const resp = await fetch(path);
+          if (resp.ok) {
+            const text = await resp.text();
+            renderReport(text);
+            return;
+          }
+        } catch (e) { /* try next path */ }
+      }
+
+      // No report found — show demo content
+      renderDemoReport();
+    }
+
+    function renderReport(markdown) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('report-content').style.display = 'block';
+      document.getElementById('report-content').innerHTML = markdownToHtml(markdown);
+      document.getElementById('pipeline-status').textContent = 'Complete';
+
+      // Extract regulation name from first heading
+      const match = markdown.match(/^#\s+(.+)/m);
+      if (match) {
+        document.getElementById('regulation-name').textContent = match[1].replace(/Compliance Report.*$/, '').trim();
+      }
+
+      // Count obligations
+      const obsMatch = markdown.match(/(\d+)\s+obligation/i);
+      if (obsMatch) {
+        document.getElementById('obligation-count').textContent = obsMatch[1];
+      }
+
+      // Last run
+      document.getElementById('last-run').textContent = new Date().toLocaleDateString();
+    }
+
+    function renderDemoReport() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('report-content').style.display = 'block';
+      document.getElementById('pipeline-status').textContent = 'Demo';
+      document.getElementById('regulation-name').textContent = 'DPDP Act 2023';
+      document.getElementById('obligation-count').textContent = '10';
+      document.getElementById('last-run').textContent = new Date().toLocaleDateString();
+
+      document.getElementById('report-content').innerHTML = `
+        <h3>Demo Mode</h3>
+        <p>This is a preview. To see the full report, run the pipeline:</p>
+        <pre style="background:#1a1a1a;padding:1rem;border-radius:4px;overflow-x:auto;color:#4ade80;font-size:0.8rem;">python3 test_pipeline.py --clean</pre>
+        <p>Then refresh this page.</p>
+        <h3>What Compliance-Disco Does</h3>
+        <ul>
+          <li><strong>Monitors</strong> regulatory bodies (SEBI, AMFI, RBI) for new publications</li>
+          <li><strong>Extracts</strong> structured obligations, timelines, and penalties</li>
+          <li><strong>Analyzes</strong> impact from marketing and engineering perspectives</li>
+          <li><strong>Delivers</strong> a unified compliance report with actionable next steps</li>
+        </ul>
+      `;
+    }
+
+    function markdownToHtml(md) {
+      return md
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2 style="font-size:1.1rem;color:#fff;margin:1.5rem 0 0.5rem;">$1</h2>')
+        .replace(/^# (.+)$/gm, '<h2 style="font-size:1.3rem;color:#fff;margin:0 0 1rem;">$1</h2>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^- (.+)$/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>\n?)+/g, (match) => `<ul>${match}</ul>`)
+        .replace(/\n\n/g, '<br><br>')
+        .replace(/\|(.+)\|/g, (match) => {
+          const cells = match.split('|').filter(c => c.trim());
+          if (cells.some(c => c.trim().match(/^[-]+$/))) return '';
+          const tag = match.includes('---') ? 'th' : 'td';
+          return '<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>';
+        });
+    }
+
+    loadReport();
+  </script>
+</body>
+</html>

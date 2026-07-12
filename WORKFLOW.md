@@ -6,11 +6,15 @@ This pipeline monitors regulatory bodies, detects new publications, and produces
 multi-department compliance analysis. It is regulation-agnostic: the same flow
 works for DPDP, SEBI, AMFI, RBI, or any other regulation.
 
+The Coordinator is the single orchestrator. It uses `delegate_task` to invoke
+all other agents (Reader, Marketing, Engineering, Consolidator) as ephemeral
+subagents within its session.
+
 ## Pipeline Stages
 
 ### Stage 0: Regulatory Monitoring
-**Agent:** `hermes-monitor` (Regulatory Monitor)
-**Trigger:** Cron (every 6-12 hours)
+**Agent:** Regulatory Monitor (cron profile)
+**Trigger:** Cron (every 6 hours)
 **Action:** Polls regulatory sources for new publications
 
 The monitor watches:
@@ -25,9 +29,9 @@ New items trigger the pipeline.
 **Output:** New regulation document saved to `docs/regulations/{body}/{date}-{title}.pdf`
 **Completion signal:** `workspace/shared-data/handoffs/monitor-to-coordinator.md`
 
-### Stage 1: Regulatory Extraction
-**Agent:** `hermes-reader` (Regulatory Reader)
-**Input:** Regulation document from Stage 0
+### Stage 1: Extraction (invoked by Coordinator)
+**Agent:** Regulatory Reader (delegate_task subagent)
+**Input:** Regulation document from Stage 0 + source_path from handoff
 **Output:** `workspace/shared-data/extracted-regulations/`
 
 The reader processes the regulation document and produces:
@@ -37,22 +41,14 @@ The reader processes the regulation document and produces:
 - `timelines.json` — enforcement dates and deadlines
 - `penalties.json` — penalty structure and enforcement mechanisms
 
-**Completion signal:** All files present in `extracted-regulations/`.
+**Completion signal:** `workspace/shared-data/handoffs/reader-to-coordinator.md`
 
-### Stage 2: Coordination & Dispatch
-**Agent:** `hermes-coord` (Coordinator)
-**Trigger:** Handoff from Regulatory Reader (or Monitor)
-**Action:** Reads extracted data, validates, dispatches to marketing and engineering in parallel.
+### Stage 2: Parallel Dispatch (invoked by Coordinator)
+**Agents:** Marketing Agent + Engineering Agent (delegate_task subagents, parallel)
 
-The coordinator:
-1. Validates extracted data is complete
-2. Reads the regulation name and source body from the handoff
-3. Creates Kanban tasks for marketing and engineering
-4. Invokes `delegate_task` to fan out work with regulation context
-5. Monitors completion, handles failures
-
-### Stage 3: Parallel Work
-**Agents:** `hermes-marketing` + `hermes-engineering`
+The coordinator validates reader output, then invokes both workers in parallel
+using `delegate_task`. Each receives the regulation name, source body, and
+file paths in their task prompt.
 
 **Marketing Agent** produces (regulation-specific content):
 - `compliance-guide.md` — customer-facing compliance guide
@@ -63,11 +59,11 @@ The coordinator:
 **Engineering Agent** produces (regulation-agnostic artifacts):
 - `data-classification.md` — data/asset categories under the regulation
 - `control-architecture.md` — technical control design
-- `impact-assessment-template.md` — assessment template (e.g., DPIA for privacy regs)
+- `impact-assessment-template.md` — assessment template
 - `implementation-guide.md` — phased technical implementation plan
 
-### Stage 4: Consolidation
-**Agent:** `hermes-consol` (Consolidator)
+### Stage 3: Consolidation (invoked by Coordinator)
+**Agent:** Consolidator (delegate_task subagent)
 **Trigger:** Both marketing and engineering complete
 **Action:** Merges all outputs, cross-validates, produces final deliverable.
 
@@ -76,7 +72,7 @@ The coordinator:
 
 ## Handoff Protocol
 
-Agents communicate through the shared workspace filesystem:
+All agents communicate through JSON handoff files in the shared workspace:
 
 ```
 workspace/shared-data/handoffs/
@@ -89,31 +85,80 @@ workspace/shared-data/handoffs/
 └── consolidation-complete.md      ← Stage 4: pipeline complete
 ```
 
-Each handoff file is a JSON document:
+### Handoff Schema (all files)
+Every handoff must contain these fields:
 ```json
 {
-  "from": "regulatory-monitor",
-  "to": "coordinator",
-  "status": "complete",
-  "timestamp": "2026-07-12T14:30:00Z",
-  "regulation_name": "DPDP Act 2023",
-  "source_body": "DPDP Board",
-  "artifacts": ["summary.md", "obligations.json"],
-  "notes": "All documents processed"
+  "from": "agent-name",
+  "to": "agent-name",
+  "status": "complete | dispatched | failed",
+  "timestamp": "ISO-8601",
+  "regulation_name": "string",
+  "source_body": "string",
+  "artifacts": ["file1.md", "file2.json"],
+  "notes": "optional context"
 }
 ```
 
-## Kanban Task States
-
-```
-TODO → IN_PROGRESS → REVIEW → DONE
-                     ↓
-                   BLOCKED (with reason)
-```
+The Coordinator validates this schema before dispatching downstream agents.
+The test pipeline (`test_pipeline.py --test-failures`) validates all handoff
+contracts with 192 assertions.
 
 ## Error Handling
 
-- If monitor fails: cron retries on next tick, no data loss
-- If reader fails: coordinator retries once, then halts pipeline
-- If one parallel agent fails: other continues, consolidator notes the gap
-- If consolidator fails: coordinator re-runs with explicit merge instructions
+| Failure | Detection | Recovery |
+|---------|-----------|----------|
+| Monitor can't reach source | Log failure, continue other sources | Cron retries on next tick |
+| Reader produces incomplete output | Coordinator checks file count + structure | Retry once with same prompt |
+| One parallel agent fails | Coordinator checks handoff existence | Continue with other; consolidator notes gap |
+| Consolidator fails | Final report missing | Coordinator re-runs with explicit merge instructions |
+| Handoff JSON is malformed | JSON parse error | Log error, skip that stage, report partial results |
+| Handoff has wrong regulation_name | Name mismatch check | Reject handoff, log error |
+
+The Coordinator always reports which stages succeeded and which failed.
+Partial results are preserved — a failed marketing agent doesn't delete
+engineering output.
+
+## Observability
+
+### Run History
+Every pipeline run is logged to `workspace/shared-data/run-history/`:
+```json
+{
+  "timestamp": "2026-07-12T14:30:00Z",
+  "regulation_name": "DPDP Act 2023",
+  "stages": [
+    {"name": "monitor", "duration": 2.3, "status": "ok"},
+    {"name": "reader", "duration": 15.7, "status": "ok"},
+    {"name": "coordinator", "duration": 0.5, "status": "ok"},
+    {"name": "marketing", "duration": 22.1, "status": "ok"},
+    {"name": "engineering", "duration": 18.4, "status": "ok"},
+    {"name": "consolidator", "duration": 12.8, "status": "ok"}
+  ],
+  "assertions": {"passed": 192, "failed": 0}
+}
+```
+
+### Trace Logging
+Each stage logs:
+- Start time and stage name
+- Key actions (files read, handoffs written, decisions made)
+- End time with status (ok / failed) and duration
+
+### Cost Tracking
+The coordinator's config routes auxiliary tasks (compression, background review)
+to Flash instead of the main model, reducing cost ~3-5x. The `tool_loop_guardrails.hard_stop_enabled: true`
+setting prevents runaway loops from burning tokens.
+
+## Kanban Integration
+
+The Coordinator creates Kanban tasks for each pipeline stage:
+```bash
+hermes kanban create "Extract {regulation_name}" --assign reader
+hermes kanban create "Marketing content for {regulation_name}" --assign marketing
+hermes kanban create "Engineering artifacts for {regulation_name}" --assign engineering
+hermes kanban create "Consolidate {regulation_name} report" --assign consolidator
+```
+
+Task states: `TODO → IN_PROGRESS → DONE` (or `BLOCKED` with reason).
+This provides persistence across crashes and visibility into pipeline state.
