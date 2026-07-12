@@ -74,7 +74,7 @@ def list_samples():
 
 
 def run_pipeline(reg_name: str, body: str, folder: str):
-    """Full chain: pdf2text -> extract -> run_pipeline.sh -> archive report."""
+    """Full chain: pdf2text -> extract -> run_pipeline.py -> archive report."""
     STATE.update(running=True, step="starting", log="", error=None, last_report=None)
     try:
         src = REG_DIR / folder
@@ -99,7 +99,8 @@ def run_pipeline(reg_name: str, body: str, folder: str):
              "--source", str(src), "--output", str(raw)])
         step("2/3 · Extracting obligations (DeepSeek)", [PY, "scripts/extract.py",
              "--text", str(raw), "--regulation", reg_name, "--body", body], env=env)
-        step("3/3 · Department agents + consolidation", ["./run_pipeline.sh"], env=env)
+        step("3/3 · Department agents + consolidation", [PY, "scripts/run_pipeline.py",
+             "--regulation", reg_name, "--body", body], env=env)
 
         report = PIPELINE_OUT / "final-report.md"
         if not report.exists():
