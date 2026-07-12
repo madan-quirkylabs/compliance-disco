@@ -1,0 +1,7 @@
+{
+  "penalties": [
+    { "breach": "Failure to take reasonable security safeguards", "max_penalty_inr": "250 crore" },
+    { "breach": "Failure to notify a personal data breach", "max_penalty_inr": "200 crore" },
+    { "breach": "Non-fulfilment of general obligations", "max_penalty_inr": "50 crore" }
+  ]
+}

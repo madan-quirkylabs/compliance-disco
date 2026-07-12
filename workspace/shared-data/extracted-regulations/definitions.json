@@ -1,0 +1,9 @@
+{
+  "definitions": {
+    "Data Principal": "The individual to whom the personal data relates.",
+    "Data Fiduciary": "The person/organisation that alone or with others determines the purpose and means of processing personal data.",
+    "Data Processor": "A person who processes personal data on behalf of a Data Fiduciary.",
+    "Personal Data": "Any data about an individual who is identifiable by or in relation to such data.",
+    "Processing": "Any operation on personal data (collection, storage, use, disclosure, erasure)."
+  }
+}

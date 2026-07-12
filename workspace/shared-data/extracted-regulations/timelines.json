@@ -1,0 +1,7 @@
+{
+  "timelines": [
+    { "event": "Breach notification to Board and affected principals", "deadline": "without delay" },
+    { "event": "Erasure after consent withdrawal / purpose completion", "deadline": "without undue delay" },
+    { "event": "Minimum log/personal-data retention", "deadline": "1 year" }
+  ]
+}

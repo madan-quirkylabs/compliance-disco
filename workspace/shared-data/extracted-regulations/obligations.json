@@ -1,0 +1,35 @@
+{
+  "regulation": "India DPDP Act 2023 + Rules 2025",
+  "obligations": [
+    {
+      "id": "D-05",
+      "provision": "S.5-6",
+      "text": "Obtain and record itemised consent per purpose before processing personal data; allow withdrawal as easily as giving it.",
+      "category": "consent"
+    },
+    {
+      "id": "D-06",
+      "provision": "S.8(7)",
+      "text": "On consent withdrawal or purpose completion, erase personal data across all systems and cause processors to erase too, unless retention is legally required.",
+      "category": "erasure"
+    },
+    {
+      "id": "D-08",
+      "provision": "S.8(5), Rule 6(a)",
+      "text": "Apply reasonable security safeguards including encryption/obfuscation/masking of personal data.",
+      "category": "security"
+    },
+    {
+      "id": "D-09",
+      "provision": "S.8(6), Rule 6(c)",
+      "text": "Detect and notify personal data breaches to the Board and affected Data Principals; maintain logs and monitoring to detect unauthorised access.",
+      "category": "breach"
+    },
+    {
+      "id": "D-11",
+      "provision": "Rule 6(e)",
+      "text": "Retain logs and personal data for at least one year to enable breach investigation, unless a longer period is required by law.",
+      "category": "retention"
+    }
+  ]
+}
