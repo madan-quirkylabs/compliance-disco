@@ -35,7 +35,7 @@ export const Route = createFileRoute("/")({
    ------------------------------------------------------------------------- */
 
 // The Test Room lives outside this app, so it opens in its own tab.
-const TEST_ROOM_URL = "https://growthx.quirkylabs.ai";
+const TEST_ROOM_URL = "https://compliance-disco-production.up.railway.app";
 
 const EYEBROW = "font-mono text-[11px] font-medium uppercase tracking-[0.11em] text-primary";
 const DISPLAY_LG =
