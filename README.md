@@ -1,98 +1,189 @@
 # Compliance-Disco
 
-A multi-agent system built on Hermes Agent that automates compliance monitoring and analysis for any regulation.
+Automated compliance monitoring and multi-department analysis for any regulation.
+Built on [Hermes Agent](https://hermes-agent.nousresearch.com/) — "AI as Agency" track, Hermes Buildathon 2026.
 
-Built for the [Hermes Buildathon 2026](https://hermes-agent.nousresearch.com/) — "AI as Agency" track.
+## What This Does for You
 
-## What It Does
+As a Chief Compliance Officer, you watch 10+ regulatory bodies for changes.
+This system does that for you — automatically, 24/7.
 
-Monitors regulatory bodies (SEBI, AMFI, RBI, etc.) for new publications. When a change is detected, it automatically triggers a multi-department analysis pipeline that produces actionable compliance insights for engineering, marketing, and leadership.
+When a new regulation, circular, or notification is published by SEBI, AMFI,
+RBI, IRDAI, TRAI, or any other body you configure, the system:
 
-DPDP Act is one example regulation processed through the system — the pipeline works for any regulation.
+1. **Detects** the new publication (cron-driven monitoring)
+2. **Extracts** structured obligations, timelines, and penalties
+3. **Analyzes** the impact from every department's perspective:
+   - **Marketing:** customer-facing compliance guides, checklists, FAQs
+   - **Engineering:** technical controls, data schemas, implementation plans
+4. **Delivers** a unified compliance report — no manual work required
+
+You go from "something changed, now what?" to "here's exactly what we need
+to do, who needs to do it, and by when" — automatically.
+
+## How to Use It
+
+### One-Time Setup (30 minutes)
+
+Requires a technical person to run once. You don't need to do this yourself.
+
+```bash
+# Install Hermes Agent
+pip install hermes-agent
+
+# Set up all agent profiles
+./setup.sh
+
+# Add your API key to any agent's config
+# Edit agents/regulatory-monitor/.hermes/.env
+```
+
+### Day-to-Day: Nothing
+
+The system runs on autopilot. Here's what happens without you lifting a finger:
+
+```
+Every 6-12 hours (configurable):
+  Monitor checks SEBI, AMFI, RBI websites
+       │
+       ├── Nothing new → [SILENT] (no notification, no cost)
+       │
+       └── New regulation found!
+            │
+            ├── Saves the document
+            ├── Extracts obligations, definitions, penalties
+            ├── Marketing agent writes compliance guide + checklist
+            ├── Engineering agent writes technical implementation plan
+            └── Consolidator merges everything → final-report.md
+```
+
+You get a report. That's it.
+
+### What You Receive
+
+A unified compliance report at `workspace/shared-data/consolidated-output/final-report.md`
+containing:
+
+| Section | What's In It |
+|---------|-------------|
+| **Executive Summary** | Plain-English overview of what changed and why it matters |
+| **Business Obligations** | What you must do, who must do it, by when |
+| **Penalties** | What happens if you don't comply (amounts and conditions) |
+| **Compliance Checklist** | Actionable items sorted by priority with deadlines and owners |
+| **Technical Implementation** | What engineering needs to build (consent mechanisms, data controls, etc.) |
+| **30-60-90 Day Plan** | Phased rollout with effort estimates |
+| **FAQ** | Answers to the questions your team will ask |
+| **Gaps & Recommendations** | What's ambiguous, what needs clarification, what to do first |
+
+### On-Demand Analysis
+
+You can also trigger an analysis manually at any time:
+
+```bash
+# "Hey, SEBI just published something about data localization"
+hermes-monitor "Check SEBI for the new data localization circular"
+
+# "Run the full pipeline on this document I just downloaded"
+hermes-reader "Extract all regulations from docs/regulations/sebi/"
+
+# "What does this mean for our engineering team?"
+hermes-engineering "Analyze the impact of the new SEBI circular on our systems"
+
+# "Give me the executive summary"
+hermes-consolidator "What's the bottom line on the latest regulation?"
+```
+
+### Adding New Regulatory Bodies
+
+The system watches SEBI, AMFI, and RBI by default. To add more:
+
+1. Edit `workspace/shared-data/monitored-sources/known-items.json`
+2. Add the new body under `"sources"`:
+```json
+{
+  "sources": {
+    "SEBI": { "last_checked": null, "items": [] },
+    "AMFI": { "last_checked": null, "items": [] },
+    "RBI": { "last_checked": null, "items": [] },
+    "IRDAI": { "last_checked": null, "items": [] },
+    "TRAI": { "last_checked": null, "items": [] }
+  }
+}
+```
+3. The monitor agent will start watching the new source on its next cron tick.
+
+### Adding New Regulations for Analysis
+
+Drop a PDF into the appropriate directory and run:
+
+```bash
+# Put the document where the reader can find it
+cp ~/Downloads/sebi-circular-2026.pdf docs/regulations/sebi/
+
+# Trigger the pipeline
+hermes-reader "Extract and analyze docs/regulations/sebi/sebi-circular-2026.pdf"
+```
+
+## What You Don't Need to Do
+
+| Task | Who Does It |
+|------|------------|
+| Watch regulatory websites | System (cron, automatic) |
+| Read and parse regulation PDFs | Regulatory Reader agent |
+| Figure out what obligations apply | Coordinator + extracted data |
+| Write compliance guides | Marketing agent |
+| Design technical controls | Engineering agent |
+| Cross-validate consistency | Consolidator agent |
+| Produce the final report | Consolidator agent |
+
+Your only job: **read the report and make decisions.**
 
 ## Architecture
 
-Six Hermes Agent profiles working in a pipeline:
-
-| Agent | Role | Input | Output |
-|-------|------|-------|--------|
-| **Regulatory Monitor** | Watch regulatory sources, detect new publications | Cron schedule + web sources | New regulation docs |
-| **Regulatory Reader** | Extract structured data from regulation documents | Regulation PDFs | Structured JSON + summary |
-| **Coordinator** | Orchestrate pipeline, dispatch subagents | Reader output | Dispatch handoffs |
-| **Marketing Agent** | Customer-facing compliance content | Extracted data | Guides, checklists, FAQs |
-| **Engineering Agent** | Technical compliance artifacts | Extracted data | Schemas, templates, architecture |
-| **Consolidator** | Merge, validate, final report | All outputs | `final-report.md` |
-
-## Quick Start
-
-```bash
-# 1. Install Hermes Agent (if not already installed)
-pip install hermes-agent
-
-# 2. Set up all 6 agent profiles
-./setup.sh
-
-# 3. Fill in API keys
-# Edit any agent's .hermes/.env with your API keys
-
-# 4. Run the pipeline
-# Option A: Use the coordinator
-hermes-coord "Run the full compliance pipeline for DPDP Act"
-
-# Option B: Run stages manually
-hermes-monitor "Check SEBI and AMFI for new regulations"
-hermes-reader "Extract all regulations from docs/regulations/dpdp/"
-hermes-coord "Dispatch to marketing and engineering agents"
-
-# 5. Test the full pipeline end-to-end
-python3 test_pipeline.py --clean
-```
-
-## Project Structure
+Six AI agents working in a pipeline:
 
 ```
-compliance-disco/
-├── docs/regulations/               ← Source regulation documents
-│   └── dpdp/                       ← Example: DPDP Act PDFs
-├── agents/
-│   ├── regulatory-monitor/         ← Agent 0: watches for changes
-│   ├── regulatory-reader/          ← Agent 1: extraction
-│   ├── coordinator/                ← Agent 2: orchestration
-│   ├── marketing-agent/            ← Agent 3a: content
-│   ├── engineering-agent/          ← Agent 3b: technical
-│   └── consolidator/               ← Agent 4: merge
-├── workspace/
-│   ├── shared-data/                ← Inter-agent data
-│   │   ├── extracted-regulations/
-│   │   ├── marketing-output/
-│   │   ├── engineering-output/
-│   │   ├── consolidated-output/
-│   │   ├── monitored-sources/      ← Known items tracking
-│   │   ├── detection-log/          ← Change detection history
-│   │   └── handoffs/
-│   └── kanban/                     ← Task board
-├── planning/                       ← Project planning docs
-├── setup.sh                        ← Initialize all profiles
-├── WORKFLOW.md                     ← Detailed orchestration flow
-├── AGENTS.md                       ← Project overview (loaded by Hermes)
-└── test_pipeline.py                ← End-to-end test simulation
+  ┌─────────────────────┐
+  │  Regulatory Monitor  │  ← Watches SEBI, AMFI, RBI for new publications
+  │  (automatic, cron)   │     Detects changes, triggers pipeline
+  └──────────┬──────────┘
+             │ new regulation detected
+             ▼
+  ┌─────────────────────┐
+  │  Regulatory Reader   │  ← Reads the regulation, extracts structured data
+  └──────────┬──────────┘
+             │ obligations, timelines, penalties
+             ▼
+  ┌─────────────────────┐
+  │    Coordinator       │  ← Validates, fans out to departments in parallel
+  └──┬──────────────┬───┘
+     │              │
+     ▼              ▼
+┌─────────┐  ┌──────────┐
+│Marketing │  │Engineering│  ← Work in parallel
+│ Agent    │  │  Agent    │
+└────┬─────┘  └────┬─────┘
+     │              │
+     ▼              ▼
+  ┌─────────────────────┐
+  │    Consolidator      │  ← Merges, cross-validates, final report
+  └─────────────────────┘
 ```
-
-## How It Works
-
-1. **Monitor** runs on a cron schedule, watches SEBI/AMFI/RBI websites
-2. When a new regulation is detected, it saves the document and signals the coordinator
-3. **Reader** extracts structured data (obligations, definitions, timelines, penalties)
-4. **Coordinator** validates extraction, fans out to Marketing + Engineering in parallel
-5. **Marketing** produces guides, checklists, FAQs, blog content for the specific regulation
-6. **Engineering** produces data schemas, control architecture, assessment templates, implementation guide
-7. **Consolidator** merges both outputs into a unified `final-report.md`
 
 ## Requirements
 
 - Hermes Agent v0.14+
 - API key for an LLM provider (OpenAI, Anthropic, etc.)
-- Regulation documents in `docs/regulations/{body}/`
+- One-time setup by a technical person (~30 minutes)
+
+## Testing
+
+```bash
+# Run the full pipeline end-to-end (DPDP Act as example)
+python3 test_pipeline.py --clean
+
+# The test simulates all 6 agents with realistic regulation data
+```
 
 ## License
 
