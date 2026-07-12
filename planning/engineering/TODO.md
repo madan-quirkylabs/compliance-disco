@@ -1,7 +1,8 @@
 # Engineering Agent — Execution Tracker
 
-> Slice notes / I/O contract live in `README.md`. This file tracks **what's left to do**.
-> Canonical agent code: `agents/engineering-agent/` (Hermes runtime). This is scratch/PM.
+> Doc map: `PLAN.md` = strategy/milestones · **this = execution checkboxes** ·
+> `README.md` = reference / I/O contract. Canonical agent code lives in
+> `agents/engineering-agent/` (Hermes runtime); this `planning/` folder is scratch/PM.
 
 Owner: engineering agent in the DPDP pipeline (parallel worker, see `/AGENTS.md`).
 Track: **AI as Agency** — a named specialist in the org-structure parameter.
