@@ -111,10 +111,7 @@ model:
   context_length: 100000
 
 terminal:
-  backend: docker
-  docker_image: "nikolaik/python-nodejs:python3.11-nodejs20"
-  docker_volumes:
-    - "/workspace"
+  backend: local
 
 compression:
   enabled: true

@@ -10,8 +10,7 @@ model:
   context_length: 100000
 
 terminal:
-  backend: docker
-  docker_image: "nikolaik/python-nodejs:python3.11-nodejs20"
+  backend: local
 
 agent:
   max_turns: 60
