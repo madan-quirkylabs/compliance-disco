@@ -91,34 +91,101 @@ export DEEPSEEK_API_KEY="sk-your-key-here"
 hermes gateway install
 ```
 
-### How the Pipeline Works
+### Architecture
 
 ```
-Cron (every 6 hours)
-  │
-  ▼
-Monitor detects new regulation on SEBI/AMFI/RBI
-  │
-  ▼
-Coordinator invokes (via delegate_task):
-  ├── Reader: extracts obligations, definitions, timelines, penalties
-  ├── Marketing: writes compliance guide, checklist, FAQ, blog post
-  ├── Engineering: writes data schemas, control architecture, implementation plan
-  └── Consolidator: merges everything into final-report.md
-  │
-  ▼
-Report delivered to CCO
+┌─────────────────────────────────────────────────────────────────────┐
+│  STAGE 0: MONITOR (Hermes cron profile)                            │
+│  ┌────────────────────────────────────────────────────────────────┐ │
+│  │  regulatory-monitor  →  watches SEBI/AMFI/RBI/DPDP Board     │ │
+│  │  runs every 6 hours via hermes gateway                        │ │
+│  │  output: handoffs/monitor-to-coordinator.md + PDF to docs/    │ │
+│  └───────────────────────┬────────────────────────────────────────┘ │
+└──────────────────────────┼──────────────────────────────────────────┘
+                           │
+┌──────────────────────────┼──────────────────────────────────────────┐
+│  STAGE 1: EXTRACTION    ▼                                           │
+│  ┌────────────────────────────────────────────────────────────────┐ │
+│  │  scripts/pdf2text.py → scripts/extract.py → 5 output files   │ │
+│  │  (pymupdf)           │ (DeepSeek API)     │                   │ │
+│  │  PDFs in docs/       │ text file           │ summary.md       │ │
+│  │  regulatory/         │ to API              │ obligations.json  │ │
+│  │                      │                     │ definitions.json  │ │
+│  │                      │                     │ timelines.json    │ │
+│  │                      │                     │ penalties.json    │ │
+│  └───────────────────────┬────────────────────────────────────────┘ │
+└──────────────────────────┼──────────────────────────────────────────┘
+                           │
+┌──────────────────────────┼──────────────────────────────────────────┐
+│  STAGE 2: PARALLEL DISPATCH (via delegate_task)                    │
+│  ┌───────────────────────┴────────────────────────────────────────┐ │
+│  │                                                                │ │
+│  │  ┌─────────────────────┐  ┌─────────────────────────────────┐ │ │
+│  │  │  MARKETING AGENT   │  │  ENGINEERING AGENT              │ │ │
+│  │  │  compliance-guide  │  │  data-classification.md         │ │ │
+│  │  │  checklist.md       │  │  control-architecture.md        │ │ │
+│  │  │  faq.md             │  │  impact-assessment-template.md  │ │ │
+│  │  │  blog-post.md       │  │  implementation-guide.md        │ │ │
+│  │  └─────────────────────┘  └─────────────────────────────────┘ │ │
+│  └───────────────────────┬────────────────────────────────────────┘ │
+└──────────────────────────┼──────────────────────────────────────────┘
+                           │
+┌──────────────────────────┼──────────────────────────────────────────┐
+│  STAGE 3: CONSOLIDATION ▼                                           │
+│  ┌────────────────────────────────────────────────────────────────┐ │
+│  │  Consolidator merges all 8 files → final-report.md           │ │
+│  └────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Running Manually
+### Manual Trigger Commands
+
+**Stage 0 — Monitor (manual check):**
+```bash
+hermes -z "Check regulatory sources for new publications. Compare against known-items.json and report any new findings."
+```
+
+**Stage 1 — PDF to Text:**
+```bash
+python scripts/pdf2text.py \
+  --source docs/regulations/dpdp/ \
+  --output workspace/shared-data/extracted-regulations/raw.txt
+```
+
+**Stage 1 — Structured Extraction:**
+```bash
+DEEPSEEK_API_KEY="sk-your-key-here" \
+python scripts/extract.py \
+  --text workspace/shared-data/extracted-regulations/raw.txt \
+  --regulation "DPDP Act 2023" \
+  --body "DPDP Board"
+```
+
+**Stage 2 — Marketing Agent:**
+```bash
+hermes -z "You are the Marketing Agent. Read extracted data from workspace/shared-data/extracted-regulations/ (summary.md, obligations.json, definitions.json, timelines.json, penalties.json). Produce 4 files in workspace/shared-data/marketing-output/: compliance-guide.md, checklist.md, faq.md, blog-post.md. Write handoff to workspace/shared-data/handoffs/marketing-to-consolidator.md."
+```
+
+**Stage 2 — Engineering Agent:**
+```bash
+hermes -z "You are the Engineering Agent. Read extracted data from workspace/shared-data/extracted-regulations/ and grounding references from agents/engineering-agent/skills/build-compliance-artifacts/references/. Produce 4 files in workspace/shared-data/engineering-output/: data-classification.md, control-architecture.md, impact-assessment-template.md, implementation-guide.md. Write handoff to workspace/shared-data/handoffs/engineering-to-consolidator.md."
+```
+
+**Stage 3 — Consolidator:**
+```bash
+hermes -z "You are the Consolidator. Read from workspace/shared-data/marketing-output/ (4 files), workspace/shared-data/engineering-output/ (4 files), and workspace/shared-data/extracted-regulations/ (5 files). Cross-validate and produce workspace/shared-data/consolidated-output/final-report.md. Write handoff to workspace/shared-data/handoffs/consolidation-complete.md."
+```
+
+**Full Pipeline (end-to-end):**
+```bash
+hermes-coord "Run the full compliance pipeline for DPDP Act"
+```
+
+### Running Tests
 
 ```bash
 # Full pipeline test (DPDP Act as example, 188 assertions)
 python3 test_pipeline.py --clean --test-failures
-
-# Trigger the real pipeline via Hermes
-hermes profile use coordinator
-hermes -z "Run the compliance pipeline for the latest SEBI circular"
 
 # View the dashboard
 cd web && python3 -m http.server 8080
