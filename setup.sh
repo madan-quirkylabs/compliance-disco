@@ -23,9 +23,10 @@ echo "Hermes version: $(hermes --version 2>/dev/null || echo 'unknown')"
 echo ""
 
 # Agent profiles to create
-AGENTS=("regulatory-reader" "coordinator" "marketing-agent" "engineering-agent" "consolidator")
+AGENTS=("regulatory-monitor" "regulatory-reader" "coordinator" "marketing-agent" "engineering-agent" "consolidator")
 DESCRIPTIONS=(
-  "Reads DPDP regulation PDFs, extracts structured compliance data"
+  "Watches regulatory bodies (SEBI, AMFI, RBI) for new publications, triggers pipeline"
+  "Reads regulation documents from any source, extracts structured compliance data"
   "Orchestrates pipeline, dispatches subagents, monitors completion"
   "Produces customer-facing compliance guides, checklists, FAQs"
   "Produces technical compliance artifacts — schemas, templates, architecture"
@@ -58,7 +59,7 @@ for i in "${!AGENTS[@]}"; do
 # $NAME — Memory
 
 ## Project
-Compliance-Disco: DPDP Act compliance automation pipeline.
+Compliance-Disco: regulation-agnostic compliance monitoring and analysis pipeline.
 
 ## Role
 $DESC
@@ -66,7 +67,7 @@ $DESC
 ## Key Paths
 - Project root: $PROJECT_ROOT
 - Shared data: $PROJECT_ROOT/workspace/shared-data/
-- Extracted regulations: $PROJECT_ROOT/workspace/shared-data/extracted-regulations/
+- Regulations: $PROJECT_ROOT/docs/regulations/
 EOF
   echo "  Initialized MEMORY.md"
 
@@ -128,6 +129,30 @@ cat > "$COORD_HOME/memories/USER.md" << 'EOF'
 - Priority: completeness > speed
 EOF
 
+# Initialize known-items.json for the monitor
+KNOWN_ITEMS="$PROJECT_ROOT/workspace/shared-data/monitored-sources/known-items.json"
+if [[ ! -f "$KNOWN_ITEMS" ]]; then
+  cat > "$KNOWN_ITEMS" << 'EOF'
+{
+  "sources": {
+    "SEBI": {
+      "last_checked": null,
+      "items": []
+    },
+    "AMFI": {
+      "last_checked": null,
+      "items": []
+    },
+    "RBI": {
+      "last_checked": null,
+      "items": []
+    }
+  }
+}
+EOF
+  echo "Initialized known-items.json for monitor"
+fi
+
 echo "=== Setup Complete ==="
 echo ""
 echo "Next steps:"
@@ -135,7 +160,7 @@ echo "  1. Fill in API keys: agents/*/.hermes/.env"
 echo "  2. Adjust model in agents/*/config.yaml if needed"
 echo "  3. Test the pipeline:"
 echo "       cd $PROJECT_ROOT"
-echo "       hermes 'Read and extract all DPDP Act documents from docs/regulations/dpdp/'"
+echo "       python3 test_pipeline.py --clean"
 echo ""
 echo "Profiles created:"
 for NAME in "${AGENTS[@]}"; do

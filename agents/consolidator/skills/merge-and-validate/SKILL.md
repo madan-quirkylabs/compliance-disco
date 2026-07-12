@@ -1,10 +1,10 @@
 ---
 name: merge-and-validate
-description: Merge marketing and engineering outputs into a unified compliance report
+description: Merge marketing and engineering outputs into a unified compliance report for any regulation
 version: 1.0.0
 metadata:
   hermes:
-    tags: [compliance, consolidation, merge]
+    tags: [compliance, consolidation, merge, regulation-agnostic]
 ---
 
 # Merge and Validate
@@ -17,19 +17,21 @@ When both parallel agents have completed their work. Trigger: "consolidate", "me
    - `workspace/shared-data/handoffs/marketing-to-consolidator.md`
    - `workspace/shared-data/handoffs/engineering-to-consolidator.md`
    If either is missing, STOP and report which is missing.
-2. Read all files from:
+2. Read the handoff files to identify the regulation name and source body.
+3. Read all files from:
    - `workspace/shared-data/marketing-output/` (4 files)
    - `workspace/shared-data/engineering-output/` (4 files)
    - `workspace/shared-data/extracted-regulations/` (5 files, for cross-reference)
-3. Cross-validate:
+4. Cross-validate:
    - Marketing claims about deadlines match engineering timelines
    - Obligation counts are consistent across both outputs
    - No contradictions between marketing and engineering recommendations
-4. Produce unified report at `workspace/shared-data/consolidated-output/final-report.md`.
+5. Produce unified report at `workspace/shared-data/consolidated-output/final-report.md`.
+   The report title must use the actual regulation name (not hardcoded to DPDP).
 
 ## Final Report Structure
 ```markdown
-# DPDP Act Compliance Report
+# {Regulation Name} Compliance Report
 ## 1. Executive Summary
 ## 2. Regulation Overview (from reader extraction)
 ## 3. Business Obligations (from marketing — guide + checklist merged)
@@ -49,3 +51,4 @@ When both parallel agents have completed their work. Trigger: "consolidate", "me
 - Don't let the report exceed 5000 words — it's a deliverable, not a novel.
 - "Gaps & Recommendations" section is mandatory — don't skip it even if everything looks clean.
 - Final report must be self-contained; reader shouldn't need to open other files.
+- Use the regulation name from the extracted data, not a hardcoded value.

@@ -4,15 +4,24 @@ A multi-agent system built on Hermes Agent for the "AI as Agency" track.
 
 ## What This Project Does
 
-Automates compliance discovery for India's Digital Personal Data Protection Act
-(DPDP Act, 2023). Reads regulation PDFs, extracts structured knowledge, and
-produces compliance artifacts for engineering and marketing teams.
+Automates compliance monitoring and analysis for any regulation. Monitors
+regulatory bodies (SEBI, AMFI, RBI, IRDAI, TRAI, DPDP Board, etc.) for new
+publications, detects changes, and triggers a multi-department analysis pipeline
+that produces actionable insights for engineering, marketing, and leadership.
 
-## Architecture: Five-Agent Pipeline
+DPDP Act is one example regulation processed through the system.
+
+## Architecture: Six-Agent Pipeline
 
 ```
   ┌─────────────────────┐
-  │  Regulatory Reader   │  ← Reads DPDP PDFs, extracts structured data
+  │  Regulatory Monitor  │  ← Watches SEBI, AMFI, RBI, etc. for new publications
+  │  (hermes-monitor)    │     Cron-driven, detects changes, triggers pipeline
+  └──────────┬──────────┘
+             │ handoff: new regulation detected
+             ▼
+  ┌─────────────────────┐
+  │  Regulatory Reader   │  ← Reads regulation documents, extracts structured data
   │  (hermes-reader)     │
   └──────────┬──────────┘
              │ handoff: extracted-regulations/
@@ -37,12 +46,12 @@ produces compliance artifacts for engineering and marketing teams.
 
 ## Data Flow
 
-1. `regulatory-reader` reads PDFs from `docs/regulations/dpdp/`
-2. Outputs structured extraction to `workspace/shared-data/extracted-regulations/`
-3. `coordinator` picks up extracted data, fans out to marketing + engineering
-4. `marketing-agent` produces content/guides → `workspace/shared-data/marketing-output/`
-5. `engineering-agent` produces code/configs → `workspace/shared-data/engineering-output/`
-6. `consolidator` merges both → `workspace/shared-data/consolidated-output/`
+1. **Monitor** watches regulatory sources via cron → detects new publication
+2. **Reader** reads the regulation document → outputs structured data to `extracted-regulations/`
+3. **Coordinator** validates extraction → fans out to Marketing + Engineering in parallel
+4. **Marketing** produces customer-facing content → `marketing-output/`
+5. **Engineering** produces technical artifacts → `engineering-output/`
+6. **Consolidator** merges both → `consolidated-output/final-report.md`
 
 ## Quick Start
 
@@ -50,7 +59,7 @@ produces compliance artifacts for engineering and marketing teams.
 # Install Hermes Agent if not already done
 # pip install hermes-agent  OR  curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 
-# Initialize all 5 profiles
+# Initialize all 6 profiles
 ./setup.sh
 
 # Start the pipeline (run from project root)
@@ -65,3 +74,4 @@ hermes-coord "Run the full compliance pipeline for DPDP Act"
 - `agents/*/skills/*/SKILL.md` — procedural skills for each agent
 - `workspace/shared-data/` — all inter-agent data lives here
 - `workspace/kanban/` — task board for coordination (Hermes SQLite kanban)
+- `test_pipeline.py` — end-to-end test simulation (DPDP as example)

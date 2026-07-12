@@ -1,34 +1,40 @@
 ---
 name: extract-regulations
-description: Read DPDP Act PDFs and extract structured compliance data
+description: Read regulation PDFs from any source and extract structured compliance data
 version: 1.0.0
 metadata:
   hermes:
-    tags: [compliance, dpdp, extraction]
+    tags: [compliance, extraction, regulation-agnostic]
 ---
 
 # Extract Regulations
 
 ## When to Use
-When processing new regulation documents. Trigger: "extract", "read regulation", "process PDF".
+When processing new regulation documents. Trigger: "extract", "read regulation", "process PDF", or a monitor handoff arrives.
 
 ## Procedure
-1. List all PDFs in `docs/regulations/dpdp/`.
-2. For each PDF, read the full text.
-3. Extract and write to `workspace/shared-data/extracted-regulations/`:
-   - `summary.md` — plain-English summary (2-3 pages max)
-   - `obligations.json` — every obligation with section ref, description, applicability, deadline
-   - `definitions.json` — all key terms with exact statutory definitions
+1. Read the monitor-to-coordinator handoff to find:
+   - `regulation_name` — e.g., "DPDP Act 2023", "SEBI Circular on Data Protection"
+   - `source_body` — e.g., "DPDP Board", "SEBI", "AMFI"
+   - `source_path` — where the PDFs/documents are stored (e.g., `docs/regulations/dpdp/`)
+2. List all PDFs/documents in the source path.
+3. For each document, read the full text.
+4. Extract and write to `workspace/shared-data/extracted-regulations/`:
+   - `summary.md` — plain-English summary (2-3 pages max), must state the regulation name and issuing body
+   - `obligations.json` — every obligation with section/article ref, description, applicability, deadline
+   - `definitions.json` — all key terms with exact definitions from the regulation
    - `timelines.json` — enforcement dates, compliance deadlines, phase-in schedules
    - `penalties.json` — penalty amounts, conditions, enforcement body
-4. Cross-check: every section of the Act must appear in at least one output file.
-5. Write handoff file when complete.
+5. Cross-check: every section/chapter of the regulation must appear in at least one output file.
+6. Write handoff file when complete.
 
 ## Output Format: obligations.json
 ```json
 [
   {
     "id": "OBL-001",
+    "regulation": "DPDP Act 2023",
+    "source_body": "DPDP Board",
     "section": "Section 4(1)",
     "title": "Consent Requirement",
     "description": "No personal data processing without consent",
@@ -41,12 +47,22 @@ When processing new regulation documents. Trigger: "extract", "read regulation",
 ]
 ```
 
-## Pitfalls
-- PDFs may have scanned images — use OCR tools if text extraction fails.
-- Cross-border transfer rules have exceptions — don't oversimplify.
-- "Significant Data Fiduciary" has separate obligations — tag them clearly.
+## Output Format: summary.md
+```markdown
+# {Regulation Name} — Summary
+**Issuing Body:** {SEBI / AMFI / RBI / DPDP Board / etc.}
+**Date:** {Publication date}
+**Applicability:** {Who must comply}
 
-## Verification
-- Count of obligations should cover every section of the Act.
-- No obligation should have an empty `section` field.
-- Summary must mention all 7 chapters of the DPDP Act.
+## Overview
+{2-3 paragraph plain-English summary}
+
+## Key Sections
+{Section-by-section breakdown}
+```
+
+## Pitfalls
+- Regulations vary wildly in structure — some use "Sections", others "Clauses", "Regulations", "Rules", "Annexures". Adapt your extraction accordingly.
+- PDFs may have scanned images — use OCR tools if text extraction fails.
+- Some regulations cross-reference other laws — note these but don't try to extract them.
+- Always tag the source body and regulation name in every output file.

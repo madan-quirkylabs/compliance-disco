@@ -4,7 +4,7 @@ description: Transform raw regulation text into structured JSON schemas
 version: 1.0.0
 metadata:
   hermes:
-    tags: [compliance, schema, dpdp]
+    tags: [compliance, schema, regulation-agnostic]
 ---
 
 # Structure Knowledge
@@ -20,7 +20,7 @@ When raw extracted data needs reorganization or schema normalization. Trigger: "
 5. Write normalized versions back to same location.
 
 ## Schema Validation Rules
-- `obligations.json`: required fields = [id, section, title, description, applies_to, deadline]
+- `obligations.json`: required fields = [id, regulation, source_body, section, title, description, applies_to, deadline]
 - `definitions.json`: required fields = [term, definition, section, category]
 - `timelines.json`: required fields = [event, date, description, related_sections]
 - `penalties.json`: required fields = [section, offense, penalty_amount, criteria]
@@ -28,3 +28,4 @@ When raw extracted data needs reorganization or schema normalization. Trigger: "
 ## Pitfalls
 - Date formats must be ISO 8601 or "Upon enactment" / "TBD".
 - Don't lose `[AMBIGUOUS]` flags during normalization.
+- Different regulations use different terminology for similar concepts — keep the original terms.
