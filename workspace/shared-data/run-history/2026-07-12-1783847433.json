@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-07-12T09:10:33.563903+00:00",
+  "total_duration": 0.01,
+  "stages": [
+    {
+      "name": "monitor",
+      "start": 1783847433.5530045,
+      "status": "ok",
+      "checks": 0,
+      "failures": 0,
+      "end": 1783847433.5627935,
+      "duration": 0.01
+    },
+    {
+      "name": "reader",
+      "start": 1783847433.5628116,
+      "status": "ok",
+      "checks": 0,
+      "failures": 0,
+      "end": 1783847433.5631495,
+      "duration": 0.0
+    },
+    {
+      "name": "coordinator",
+      "start": 1783847433.5631547,
+      "status": "ok",
+      "checks": 0,
+      "failures": 0,
+      "end": 1783847433.5632555,
+      "duration": 0.0
+    },
+    {
+      "name": "marketing",
+      "start": 1783847433.5632582,
+      "status": "ok",
+      "checks": 0,
+      "failures": 0,
+      "end": 1783847433.5634546,
+      "duration": 0.0
+    },
+    {
+      "name": "engineering",
+      "start": 1783847433.5634568,
+      "status": "ok",
+      "checks": 0,
+      "failures": 0,
+      "end": 1783847433.5636523,
+      "duration": 0.0
+    },
+    {
+      "name": "consolidator",
+      "start": 1783847433.5636547,
+      "status": "ok",
+      "checks": 0,
+      "failures": 0,
+      "end": 1783847433.5637925,
+      "duration": 0.0
+    }
+  ],
+  "assertions": {
+    "passed": 188,
+    "failed": 0,
+    "errors": []
+  }
+}

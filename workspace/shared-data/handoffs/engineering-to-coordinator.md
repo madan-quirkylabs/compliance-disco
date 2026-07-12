@@ -4,5 +4,5 @@
   "status": "complete",
   "regulation_name": "DPDP Act 2023",
   "artifact": "engineering-requirements.md",
-  "notes": "15 engineering requirements produced (5 P0, 6 P1, 4 P2), each mapped to specific DPDP obligations and affected systems. Key deliverables: new consent-svc microservice, cross-system erasure pipeline, breach detection/notification pipeline, encryption remediation on 3 systems, and expanded log retention. See workspace/shared-data/engineering-output/engineering-requirements.md for the full document."
+  "notes": "Produced 16 engineering requirements (7 P0, 6 P1, 3 P2) mapping all 55 DPDP obligations against system inventory. REQ-1 (consent-svc) is the foundational build; REQ-4 (breach detection), REQ-5 (erasure pipeline), and REQ-8 (encryption) are P0 security/privacy prerequisites. Full dependency map included in the document."
 }

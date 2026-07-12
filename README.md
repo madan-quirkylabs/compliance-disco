@@ -187,9 +187,27 @@ hermes-coord "Run the full compliance pipeline for DPDP Act"
 # Full pipeline test (DPDP Act as example, 188 assertions)
 python3 test_pipeline.py --clean --test-failures
 
-# View the dashboard
+# View the dashboard (static)
 cd web && python3 -m http.server 8080
 # Open http://localhost:8080
+```
+
+### Live Demo Server
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the server
+python server.py
+# Open http://localhost:9000
+
+# API endpoints:
+#   GET  /              — Dashboard
+#   GET  /api/status    — Pipeline status
+#   POST /api/run       — Trigger pipeline
+#   GET  /api/report    — Get final report
+#   GET  /api/handoffs  — View all handoffs
 ```
 
 ### Architecture

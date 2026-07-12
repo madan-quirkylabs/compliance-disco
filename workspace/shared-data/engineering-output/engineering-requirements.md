@@ -1,203 +1,376 @@
 # Engineering Requirements — DPDP Act 2023 Compliance
 
-This document translates the 57 obligations extracted from the DPDP Act 2023 and DPDP Rules 2025 into concrete, actionable engineering requirements for the engineering team. Each requirement maps to one or more real obligations (OBL-ids from `obligations.json`), references the affected system(s) from the current system inventory, and includes measurable acceptance criteria. Priorities reflect compliance risk: P0 requirements are mandatory at enforcement and carry the highest penalty exposure; P1 requirements are mandated within 18-month transition periods or expose significant penalty risk; P2 requirements are important but lower-risk or supporting infrastructure. The team should treat this as a build backlog with the P0 items as the first sprint target.
+## Summary
 
-## Requirements
-
-### REQ-1: Consent Management Service
-- **Obligation(s):** OBL-001 (Lawful Processing), OBL-005 (Valid Consent), OBL-007 (Right to Withdraw), OBL-008 (Cessation on Withdrawal), OBL-010 (Burden of Proof)
-- **Requirement Statement:** Build a new `consent-svc` microservice that captures, stores, and manages consent records for every Data Principal. The service must record the exact scope, purpose, timestamp, and version of each consent; support withdrawal with ease comparable to giving consent; and provide a tamper-evident audit trail for burden-of-proof compliance.
-- **Acceptance Criteria:**
-  - Consent records include: principal ID, purpose, data categories, timestamp, consent version, language choice, and proof of affirmative action.
-  - Withdrawal is achievable through the same user journey as consent (same number of clicks/steps).
-  - On withdrawal, `consent-svc` emits a `consent.withdrawn` event that downstream systems (REQ-4) consume to trigger erasure.
-  - Audit trail is append-only and queryable by regulator.
-  - Burden-of-proof: an API endpoint returns the full consent chain for a given principal + purpose on demand.
-- **Priority:** P0
-- **Affected System(s):** `consent-svc` (new), `api`, `user-db`
-
-### REQ-2: Consent Notice & Multilingual Consent UX
-- **Obligation(s):** OBL-002 (Notice to Data Principal), OBL-003 (Pre-existing Consent Notice), OBL-004 (Language Option), OBL-006 (Clear Language), OBL-035 (Notice Content — Rule 3)
-- **Requirement Statement:** Implement a consent-notice flow in the `web-app` (React SPA) and `api` that presents every consent request with an independently understandable, itemised notice listing each data element, its purpose, and how to exercise rights. Provide the option to read the notice in English or any Eighth Schedule language (22 Indian languages). For pre-existing users (OBL-003), trigger a re-notification campaign at next login with a "pending consent review" banner.
-- **Acceptance Criteria:**
-  - Notice is shown separately from any general terms-of-service — it is a distinct, focused UI.
-  - Language picker appears before the notice is rendered; selection persists to all subsequent notices.
-  - Each data element is listed individually with a checkbox (or equivalent affirmative action).
-  - The notice includes: DPO contact (see REQ-10), link to withdrawal flow, link to grievance portal (REQ-7), and link to rights portal (REQ-8).
-  - Pre-existing users see the new notice on first login after deployment; a `notice_acknowledged_at` flag is stored.
-- **Priority:** P0
-- **Affected System(s):** `web-app`, `api`, `consent-svc`, `user-db`
-
-### REQ-3: Breach Detection, Alerting & Notification Pipeline
-- **Obligation(s):** OBL-016 (Security Safeguards), OBL-017 (Breach Intimation), OBL-038 (Rule 6 Security Measures), OBL-039 (Breach Process — Rule 7)
-- **Requirement Statement:** Build a breach-detection pipeline that monitors logs, system events, and anomaly signals; triggers automated alerts; and drives a notification workflow to the DPDP Board (initial intimation without delay, detailed report within 72 hours) and to each affected Data Principal (without delay). The pipeline must cover all systems that store or process personal data.
-- **Acceptance Criteria:**
-  - Detection covers: unauthorised access attempts, anomalous data-exfiltration patterns, encryption-key compromise, and infrastructure-level alerts (IAM policy changes, S3 bucket policy changes, unexpected data transfers).
-  - Board notification template is pre-approved and includes: description of breach, nature of personal data affected, categories and approximate number of Data Principals, consequences, measures taken, and contact for further information.
-  - Data Principal notification is triggered automatically and delivered via their registered mode (email/SMS/in-app notification) and includes: description, consequences, safety steps, and contact point.
-  - A breach-case management dashboard exists for the DPO and incident-response team to update the detailed report within the 72-hour window.
-  - All notifications are logged for audit (obligation OBL-010 / burden of proof).
-- **Priority:** P0
-- **Affected System(s):** `logs` (CloudWatch), `api`, `events` (Kafka), `blob-store` (S3), `user-db` (RDS), `web-app`
-
-### REQ-4: Cross-System Data Erasure Pipeline
-- **Obligation(s):** OBL-008 (Cessation on Withdrawal), OBL-018 (Erasure), OBL-019 (Deemed No Longer Served), OBL-029 (Correction), OBL-030 (Erasure upon Request), OBL-040 (Inactive Account Erasure — Rule 8(1)), OBL-041 (Prior Notice before Erasure — Rule 8(2)), OBL-042 (Log Retention — Rule 8(3))
-- **Requirement Statement:** Build a centralised erasure-orchestration service (or extend `consent-svc`) that, upon consent withdrawal, Data Principal erasure request, or inactivity-trigger, orchestrates deletion across all systems holding personal data: `user-db`, `events`, `blob-store`, `cache`, `analytics`, and `logs`. Implement a 48-hour pre-erasure notification to the Data Principal (Rule 8(2)). For inactive accounts (OBL-040), enforce erasure after 3 years of inactivity per the Third Schedule time period.
-- **Acceptance Criteria:**
-  - Erasure request flows through a state machine: `RECEIVED → NOTIFIED (48h timer) → ERASING → VERIFIED → COMPLETE`.
-  - Each downstream system has a plugin/adapter that performs the actual deletion and returns a verification hash.
-  - If a system fails to delete (e.g., retention required by law), the erasure record marks an exception with the legal basis cited.
-  - For inactive accounts: a background cron detects accounts with no principal activity for the prescribed period, sends pre-erasure notice, and queues erasure.
-  - Logs (OBL-042) are retained for a minimum of 1 year from processing date, then erased by this same pipeline.
-- **Priority:** P0
-- **Affected System(s):** `user-db`, `events`, `blob-store`, `cache`, `analytics` (Snowflake), `logs` (CloudWatch), `consent-svc`
-
-### REQ-5: Encryption-at-Rest Remediation
-- **Obligation(s):** OBL-015 (Technical/Organisational Measures), OBL-016 (Security Safeguards), OBL-038 (Rule 6 — encryption/obfuscation/masking, access controls)
-- **Requirement Statement:** Remediate encryption-at-rest gaps across three systems: `events` (Kafka), `blob-store` (S3 legacy bucket), and `cache` (Redis). For Kafka, enable TLS encryption for data in transit and enable at-rest encryption for the topic storage. For the S3 legacy bucket, enable default AES-256 SSE; if the bucket policy cannot be changed, migrate objects to an encrypted bucket. For Redis, enable AOF persistence encryption and TLS for client connections. Additionally, implement field-level masking for PII fields in Kafka event payloads.
-- **Acceptance Criteria:**
-  - All three systems have encryption-at-rest verified via AWS Config rules or equivalent.
-  - Kafka topic payloads have PII fields (user_id in behavioural events) masked or tokenised at the producer level.
-  - No unencrypted personal data exists in any data store as confirmed by a one-time scan and a recurring enforcement job.
-  - Access logs for encrypted stores show no policy-violation events.
-- **Priority:** P1
-- **Affected System(s):** `events` (Kafka), `blob-store` (S3), `cache` (Redis)
-
-### REQ-6: Audit-Log Retention & Enriched Audit Events
-- **Obligation(s):** OBL-015 (Technical Measures), OBL-038 (Rule 6 — logging, 1-year retention), OBL-042 (Min 1 Year Log Retention — Rule 8(3))
-- **Requirement Statement:** Extend CloudWatch log retention from the current 90 days to a minimum of 1 year (400 days for safety margin). Enrich `api` and `consent-svc` audit logging to produce structured JSON events capturing every PII access, consent operation, rights-request action, and admin action. At the 1-year mark, the erasure pipeline (REQ-4) must handle log expiry.
-- **Acceptance Criteria:**
-  - CloudWatch log-group retention policy set to 400 days for all log groups carrying personal-data or audit events.
-  - Structured audit event schema includes: timestamp, actor (principal/admin ID), action, resource, outcome (success/failure), request ID, and IP address.
-  - All `api` endpoints that read/write personal data emit an audit event.
-  - All `consent-svc` operations (create, read, update, withdraw) emit an audit event.
-  - Logs are searchable (CloudWatch Logs Insights or export to an SIEM).
-- **Priority:** P1
-- **Affected System(s):** `logs` (CloudWatch), `api`, `consent-svc`
-
-### REQ-7: Grievance Redressal Portal
-- **Obligation(s):** OBL-021 (Grievance Redressal Mechanism), OBL-031 (Readily Available Means), OBL-032 (Respond within Prescribed Period), OBL-052 (90 Days — Rule 14(3))
-- **Requirement Statement:** Build a self-service grievance portal (within the existing `web-app` and `api`) where Data Principals can submit, track, and receive responses to grievances about their data processing. The portal must automatically acknowledge receipt, route grievances to the appropriate team, track the 90-day response window, and escalate overdue cases.
-- **Acceptance Criteria:**
-  - Grievance submission form captures: principal identity, nature of grievance, affected data, desired resolution, and supporting documents.
-  - Auto-generated acknowledgement with a grievance ticket ID is sent to the principal within 5 minutes.
-  - Dashboard for DPO/operations team shows all open grievances, aging (days since receipt), and escalations.
-  - Automated escalation: if no resolution within 75 days, notify DPO; if 90 days passed, flag as compliance breach.
-  - Final response includes: findings, action taken, and right to appeal to the DPDP Board.
-  - All grievance actions are logged as audit events (REQ-6).
-- **Priority:** P1
-- **Affected System(s):** `web-app`, `api`, `user-db`
-
-### REQ-8: Data Principal Rights Portal
-- **Obligation(s):** OBL-029 (Correction/Completion/Update), OBL-030 (Erasure upon Request), OBL-051 (Publish Means for Rights — Rule 14(1))
-- **Requirement Statement:** Build a self-service rights portal within the `web-app` where Data Principals can exercise the following rights under the Act: (a) correct inaccurate or misleading personal data, (b) complete incomplete data, (c) erase personal data (triggers REQ-4), and (d) access a copy of their personal data in a machine-readable format. Each request type must have a distinct flow, fulfilment tracking, and audit trail.
-- **Acceptance Criteria:**
-  - Correction request: principal sees their current stored data fields (name, email, phone) and can submit corrections; an approval workflow verifies the identity before applying changes; changes logged to audit.
-  - Erasure request: principal can request erasure of specific data categories or full account; triggers REQ-4 pipeline.
-  - Access request: generates a downloadable JSON/CSV export of all personal data held by the organisation, aggregated from all systems (`user-db`, `events`, `blob-store` metadata, `analytics`).
-  - Each request has a status tracker visible in the portal (e.g., RECEIVED → IN_PROGRESS → COMPLETED).
-  - The portal is reachable from every page footer (persistent link).
-- **Priority:** P1
-- **Affected System(s):** `web-app`, `api`, `user-db`, `events`, `blob-store`, `analytics`
-
-### REQ-9: Child Data Protection Controls
-- **Obligation(s):** OBL-022 (Verifiable Parental Consent), OBL-023 (No Detrimental Effect), OBL-024 (No Tracking/Ads for Children), OBL-044 (Verifiable Consent Due Diligence — Rule 10), OBL-045 (Disability Guardian — Rule 11)
-- **Requirement Statement:** Implement age-verification gating at account registration and during any data-processing flow. For users identified as minors, require verifiable parental/guardian consent through a due-diligence process (reliable identification or authorised virtual token). Enforce restrictions: no behavioural tracking, no targeted advertising, and no processing likely to cause detrimental effect. Extend the same framework for persons with disabilities who require a lawful guardian.
-- **Acceptance Criteria:**
-  - Account registration flow includes an age-declaration step; if under 18, the flow branches to a parental-consent gate.
-  - Parental-consent flow requires the parent to provide verifiable identification (Aadhaar-based verification or a government-authorised virtual token API) and then give explicit consent on the child's behalf.
-  - Once verified, the parent's consent is stored in `consent-svc` with the child's principal ID tagged as `guardian_consented`.
-  - Behavioural tracking (`events` Kafka) is disabled for user_ids flagged as children; ad-serving logic in `analytics` filters them out.
-  - For persons with disabilities: the portal accepts guardian declarations from court/designated authority, and those guardian relationships are logged and verifiable.
-  - Any attempt to circumvent the age gate is logged as a security event.
-- **Priority:** P1
-- **Affected System(s):** `web-app`, `api`, `consent-svc`, `user-db`, `events`, `analytics`
-
-### REQ-10: DPO Contact Publishing
-- **Obligation(s):** OBL-020 (Publish Contact Information), OBL-043 (Prominently Publish DPO Contact — Rule 9)
-- **Requirement Statement:** Publish the business contact information of the Data Protection Officer (or a designated person able to answer processing-related questions) prominently on the `web-app` (website footer, account settings page, and consent-notice pages) and include it in every automated email response (grievance acknowledgement, rights-request acknowledgement, breach notification, consent notice). The contact info must be configurable without a code deploy (via a CMS or environment variable).
-- **Acceptance Criteria:**
-  - DPO name, email, phone, and physical address appear in: website footer (all pages), `/privacy` page, `/contact` page, consent-notice UI (REQ-2), grievance portal (REQ-7), and rights portal (REQ-8).
-  - All transactional emails (grievance ack, rights ack, breach notification, consent notice) include a "Contact our DPO" section.
-  - Contact information is configurable via a DB record or config file — no code change needed to update.
-- **Priority:** P2
-- **Affected System(s):** `web-app`, `api`
-
-### REQ-11: Data Processor Contract & Compliance Tracker
-- **Obligation(s):** OBL-013 (Contract with Data Processor)
-- **Requirement Statement:** Build a contract-management module in the `api` and `user-db` that registers every Data Processor the organisation engages, stores the executed contract, tracks renewal dates, and enforces that no data-sharing can occur with an unregistered or out-of-contract processor. The module must also track which personal data categories each processor accesses and for what purpose.
-- **Acceptance Criteria:**
-  - API endpoint `POST /processors` registers a processor with: name, contact, contract period, data categories, purpose, data-residency commitment.
-  - A scheduled cron checks for contracts expiring within 30 days and notifies the DPO.
-  - Data-sharing to an unregistered or expired processor is blocked at the `api` gateway level.
-  - All processor registrations and changes are logged as audit events.
-- **Priority:** P2
-- **Affected System(s):** `api`, `user-db`
-
-### REQ-12: Data Quality Gates for Decision-Making
-- **Obligation(s):** OBL-014 (Completeness, Accuracy, Consistency)
-- **Requirement Statement:** Implement data-quality validation gates in the `api` that ensure personal data used to make decisions affecting the Data Principal (e.g., eligibility checks, pricing, risk scoring) is complete, accurate, and internally consistent before the decision is computed. Where the data fails validation, the system must log the deficiency and escalate to a human reviewer rather than making a decision on incomplete data.
-- **Acceptance Criteria:**
-  - Decision endpoints call a `POST /data-quality/validate` middleware before executing the decision logic.
-  - Validation checks: completeness (no critical field is null), cross-field consistency (e.g., age vs. date-of-birth match), and recency (data not stale beyond configured TTL).
-  - Failed validations block the decision and trigger an alert to the operations team with the specific deficiency.
-  - All validation results (pass/fail/reason) are logged as audit events (REQ-6).
-- **Priority:** P2
-- **Affected System(s):** `api`
-
-### REQ-13: SDF — DPIA & Audit Evidence Dashboard
-- **Obligation(s):** OBL-027 (Periodic DPIA), OBL-028 (Periodic Audit — SDF), OBL-047 (Annual DPIA and Audit — Rule 13(1)), OBL-048 (Report to Board — Rule 13(2)), OBL-049 (Algorithmic Software Diligence — Rule 13(3))
-- **Requirement Statement:** Build an internal dashboard (within `api` + `web-app`) that collates evidence required for the annual Data Protection Impact Assessment and independent audit required of a Significant Data Fiduciary. The dashboard must track: data-processing register, system-access patterns, consent-metrics, erasure requests, breach incidents, processor contracts, and algorithmic-software risk assessments. Produce a standardised report that can be furnished to the DPDP Board.
-- **Acceptance Criteria:**
-  - Dashboard shows: total Data Principals, active consent records by purpose, pending/due erasure queue, open breaches, open grievances, processor contracts expiring, and last DPIA date.
-  - The "Algorithmic Software Register" lists every model/rule/algo that processes personal data, with a due-diligence attestation and risk rating.
-  - A "Generate DPIA Report" button produces a PDF/JSON that matches the Board's prescribed format.
-  - The dashboard is accessible only to authenticated DPO and audit-team accounts (RBAC).
-  - A cron sets a reminder 60 days before the annual DPIA due date.
-- **Priority:** P2
-- **Affected System(s):** `web-app`, `api`, `user-db`, `logs`
-
-### REQ-14: Data Residency & Cross-Border Transfer Controls
-- **Obligation(s):** OBL-034 (Restriction on Transfer), OBL-050 (SDF Data Localisation — Rule 13(4)), OBL-053 (Cross-Border Rules — Rule 15)
-- **Requirement Statement:** Implement infrastructure and application controls that ensure specified personal data (as notified by the Central Government) remains within India (AWS ap-south-1 region). For the SDF scenario, enforce data-localisation rules: prevent cross-region replication of `user-db`, `blob-store` objects, and `analytics` exports to non-India regions. Log and alert on any cross-region data-transfer attempt.
-- **Acceptance Criteria:**
-  - AWS S3 bucket policy denies replication to non-ap-south-1 regions for buckets classifyable as holding personal data.
-  - RDS cross-region read-replicas are disabled or restricted to ap-south-1-only.
-  - Snowflake account-level data-residency controls are configured (cloud region locked to AWS ap-south-1).
-  - Any call to a cross-region data-transfer API (e.g., `PutBucketReplication` with non-ap-south-1 destination) triggers an immediate security alert (REQ-3).
-  - A quarterly compliance job scans all resources and reports any misconfiguration.
-- **Priority:** P1
-- **Affected System(s):** `user-db` (RDS), `blob-store` (S3), `analytics` (Snowflake), `events` (Kafka Cross-Region Mirror)
-
-### REQ-15: Legitimate Use Processing Framework
-- **Obligation(s):** OBL-001 (Lawful Processing), OBL-011 (Certain Legitimate Uses — Section 7)
-- **Requirement Statement:** Extend the `consent-svc` and `api` to support a "legitimate use" processing category alongside consent-based processing. When personal data is processed under Section 7 legitimate uses (state benefits, medical emergencies, employment, legal obligations, etc.), the system must record the specific legal basis cited, limit processing to what is necessary for that purpose, and still honour all Data Principal rights (correction, erasure, grievance). The legitimate-basis record must be as auditable as a consent record.
-- **Acceptance Criteria:**
-  - `consent-svc` accepts a second processing basis `legitimate_use` with fields: basis (enum: `section_7_voluntary`, `section_7_state_benefit`, `section_7_medical`, `section_7_employment`, `section_7_legal_obligation`), purpose, data categories, and legal citation.
-  - Processing under legitimate use is still subject to the erasure pipeline (REQ-4) — if the purpose is no longer served, data must be erased.
-  - The Data Principal's rights portal (REQ-8) still works for data held under legitimate use — the principal can request correction/erasure/access regardless of the processing basis.
-  - Legitimate-use records appear in the DPIA dashboard (REQ-13).
-- **Priority:** P2
-- **Affected System(s):** `api`, `consent-svc`, `user-db`
+This document translates the 55 compliance obligations from the DPDP Act 2023 (extracted by the Regulatory Reader) into concrete engineering requirements for the B2B SaaS platform (AWS Mumbai, `ap-south-1`). The org must build a consent management service, a data subject rights portal, a breach notification pipeline, and remediate gaps in encryption, logging retention, data erasure, and child-data safeguards — mapped against the current system inventory (`web-app`, `api`, `user-db`, `events`, `blob-store`, `cache`, `analytics`, `logs`). Each requirement cites the obligation IDs from `obligations.json`, the mapped control-framework IDs from `controls.md` (ISO 27001:2022 / SOC 2 / NIST 800-53), and the affected system from `system-inventory.md`.
 
 ---
 
-## Summary Matrix
+## Requirements
 
-| REQ ID | Priority | Key Obligations | Primary System(s) |
-|--------|----------|-----------------|-------------------|
-| REQ-1 | P0 | OBL-001, OBL-005, OBL-007, OBL-008, OBL-010 | consent-svc (new), api, user-db |
-| REQ-2 | P0 | OBL-002, OBL-003, OBL-004, OBL-006, OBL-035 | web-app, api, consent-svc |
-| REQ-3 | P0 | OBL-016, OBL-017, OBL-038, OBL-039 | logs, api, events, blob-store, user-db |
-| REQ-4 | P0 | OBL-008, OBL-018, OBL-019, OBL-029, OBL-030, OBL-040, OBL-041, OBL-042 | All systems |
-| REQ-5 | P1 | OBL-015, OBL-016, OBL-038 | events, blob-store, cache |
-| REQ-6 | P1 | OBL-015, OBL-038, OBL-042 | logs, api, consent-svc |
-| REQ-7 | P1 | OBL-021, OBL-031, OBL-032, OBL-052 | web-app, api, user-db |
-| REQ-8 | P1 | OBL-029, OBL-030, OBL-051 | web-app, api, user-db, events, blob-store, analytics |
-| REQ-9 | P1 | OBL-022, OBL-023, OBL-024, OBL-044, OBL-045 | web-app, api, consent-svc, user-db, events, analytics |
-| REQ-10 | P2 | OBL-020, OBL-043 | web-app, api |
-| REQ-11 | P2 | OBL-013 | api, user-db |
-| REQ-12 | P2 | OBL-014 | api |
-| REQ-13 | P2 | OBL-027, OBL-028, OBL-047, OBL-048, OBL-049 | web-app, api, user-db, logs |
-| REQ-14 | P1 | OBL-034, OBL-050, OBL-053 | user-db, blob-store, analytics, events |
-| REQ-15 | P2 | OBL-001, OBL-011 | api, consent-svc, user-db |
+### REQ-1: Consent & Notice Management Service
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-001, OBL-002, OBL-004, OBL-005, OBL-008, OBL-030 |
+| **Control mapping** | Consent/lawful-basis management (ISO A.5.34 / SOC 2 P-series / NIST privacy overlay) |
+| **Priority** | P0 |
+| **Affected systems** | `consent-svc` (new), `web-app`, `api`, `user-db` |
+
+**Requirement statement:** Build a dedicated `consent-svc` microservice that captures, stores, and evidences data principal consent in accordance with Section 5–6 and Rule 3. Every consent transaction must meet the "free, specific, informed, unconditional, unambiguous, clear affirmative action" standard (OBL-004) and be preceded by a compliant notice (OBL-002, OBL-030). The service must generate audit-grade records that satisfy burden-of-proof requirements (OBL-008).
+
+**Acceptance criteria:**
+- Consent flow produces an independent notice screen (not buried in ToS) showing: itemised list of personal data collected, each specific purpose, communication link, means to withdraw consent, means to exercise rights, and complaint link to the Board (OBL-030, OBL-005).
+- User must take a clear affirmative action (e.g. unchecked checkbox → user checks it; no pre-ticked boxes) for each purpose independently.
+- Every consent event is logged immutably: timestamp, user_id, consent_version, notice_version, purpose(s), IP, user-agent.
+- The log record is admissable as evidence — tamper-evident (e.g. append-only table or hash chain).
+- `user-db` schema extended with `consent_records` table (or dedicated `consent-svc` DB) indexed by user_id + purpose.
+- `consent-svc` exposes gRPC/REST API: `RecordConsent()`, `GetConsentStatus(user_id, purpose)`, `GetConsentAuditTrail(user_id)`.
+- `web-app` consent UI is gated: no processing begins until consent is recorded.
+- Integration test: replayed audit log proves consent was given before any data processing event.
+
+---
+
+### REQ-2: Consent Withdrawal & Processing Cessation Pipeline
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-006, OBL-007 |
+| **Control mapping** | Consent/lawful-basis management (ISO A.5.34 / SOC 2 P-series / NIST privacy overlay); Data retention & deletion (ISO A.8.10 / NIST MP-6) |
+| **Priority** | P0 |
+| **Affected systems** | `consent-svc` (new), `events`, `analytics`, `blob-store`, `api`, `cache` |
+
+**Requirement statement:** Withdrawal must be as easy as giving consent (OBL-006). Upon withdrawal, the platform must cease processing the data principal's personal data within a reasonable time and propagate cessation to all downstream systems — including Data Processors if any (OBL-007).
+
+**Acceptance criteria:**
+- Withdrawal UI is within 1 click of the same screen where consent was given; available in both web-app and API.
+- Withdrawal event triggers a fan-out job to: `events` (stop producing events for user_id), `analytics` (queue anonymisation rule), `blob-store` (mark docs as non-processing), `cache` (evict user sessions), `api` (block processing endpoints for that user_id).
+- The cessation is acknowledged by each downstream system within a configurable SLA (default 1 hour).
+- A dashboard shows pending/complete cessation for each withdrawal.
+- Integration test: after withdrawal, no new processing events appear for that user_id across the entire pipeline (verified via log audit).
+
+---
+
+### REQ-3: Multi-Language Notice & Consent Support
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-003, OBL-005 |
+| **Control mapping** | Consent/lawful-basis management (ISO A.5.34 / SOC 2 P-series) |
+| **Priority** | P1 |
+| **Affected systems** | `web-app`, `consent-svc` (new), `api` |
+
+**Requirement statement:** Data principals must have the option to access consent notices in English or any Eighth Schedule language (OBL-003). Every consent request UI must carry the language toggle and DPO contact info (OBL-005).
+
+**Acceptance criteria:**
+- Language preference is detected from browser `Accept-Language` header and offered as a toggle on the consent/notice screen.
+- All 22 Eighth Schedule languages are available as locales (start with top 8: Hindi, Bengali, Telugu, Marathi, Tamil, Urdu, Gujarati, Kannada — delivery teams to supply translations).
+- `web-app` consent template is i18n-ready: ICU MessageFormat strings in a JSON locale bundle.
+- DPO contact information (email, phone, address) renders dynamically in the consent request UI (OBL-005).
+- Fallback: if a locale is incomplete, render in English with a banner "Partial translation available".
+
+---
+
+### REQ-4: Breach Detection, Alerting & Notification System
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-013, OBL-014, OBL-034, OBL-035, OBL-036 |
+| **Control mapping** | Incident/breach response (ISO A.5.24–A.5.28 / SOC 2 CC7.3–CC7.4 / NIST IR-4, IR-6); Logging & monitoring (ISO A.8.15–A.8.16 / SOC 2 CC7.2 / NIST AU-2, AU-6, SI-4) |
+| **Priority** | P0 |
+| **Affected systems** | `logs`, `api`, `web-app`, `user-db`, `events`, `blob-store`, `cache` |
+
+**Requirement statement:** Implement a breach detection and notification pipeline meeting Rule 6 (security safeguards) and Rule 7 (breach intimation). The system must: (a) detect personal data breaches in near-real-time from security event signals, (b) notify affected data principals without delay via their registered channel, (c) file a detailed intimation to the DPDP Board within 72 hours per Rule 7(2), and (d) retain breach audit records for at least 1 year.
+
+**Acceptance criteria:**
+- SIEM/webhook integration connects `logs` (CloudWatch), `api` (failed auth patterns), `user-db` (unusual query volume), `events` (anomalous data egress) into a central breach-detection pipeline.
+- On breach classification (PII confirmed exposed), the system immediately fires intimation to: each affected data principal via registered communication (email/SMS/in-app) with: description, consequences, mitigation steps, safety measures, DPO contact (OBL-035).
+- Within 72 hours, a Board intimation report is auto-generated containing: events/circumstances/reasons, affected records count, person causing breach (if known), remediation steps, and a copy of data-principal intimations (OBL-036).
+- Board report is storable as PDF and submitable via API/web portal (placeholders for future Board system).
+- Logs (breach signals, notifications sent, filings made) retained for a minimum of 1 year (OBL-034, OBL-039).
+- At-rest encryption on `blob-store` legacy bucket remediated as prerequisite (OBL-013; existing gap). See also REQ-8.
+- Automated test: simulated breach event triggers notification within 5 min SLA; Board report completes within 72-hour window.
+
+---
+
+### REQ-5: Cross-System Data Erasure Pipeline
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-015, OBL-027, OBL-037, OBL-038 |
+| **Control mapping** | Data retention & deletion (ISO A.8.10 / SOC 2 A1.2 / NIST SI-12, MP-6) |
+| **Priority** | P0 |
+| **Affected systems** | `user-db`, `events`, `blob-store`, `cache`, `analytics`, `logs` |
+
+**Requirement statement:** Build an automated erasure pipeline that (a) erases personal data upon consent withdrawal or purpose no longer being served (OBL-015), (b) processes data subject erasure requests (OBL-027), (c) enforces time-based erasure for covered Data Fiduciaries after 3 years (OBL-037), and (d) sends a 48-hour pre-erasure notice to the data principal (OBL-038).
+
+**Acceptance criteria:**
+- A centralized `erasure-orchestrator` service manages the lifecycle: trigger → notify-systems → confirm-erasure → log-evidence.
+- Each system exposes a `DELETE /user-data/{user_id}` or equivalent that hard-deletes/anonymises PII fields:
+  - `user-db`: hard-delete user row or anonymise PII columns (name→NULL, email→hash+delete, phone→NULL).
+  - `events`: anonymise keyed user_id or drop events.
+  - `blob-store`: delete objects or replace with redacted version.
+  - `cache`: evict all keys matching user.
+  - `analytics`: replace user_id with irreversible pseudonym; aggregate tables unaffected.
+  - `logs`: redact PII fields in archived logs (log retention obligation aside — redact PII, keep structural logs).
+- Pre-erasure notice (OBL-038): at least 48 hours before auto-erasure (OBL-037), send email/in-app notification that data will be erased unless user contacts the platform.
+- Erasure audit trail: user_id, timestamp, trigger (withdrawal/request/time-based), systems confirmed, retention override if any (with legal basis citation).
+- Erasure completes within SLA: 72 hours for requests, 48-hour notice window respected for time-based.
+- Integration test: verify erasure leaves no PII trace across all systems by attempting to re-identify the user from each store.
+
+---
+
+### REQ-6: Data Subject Rights Portal
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-026, OBL-027, OBL-048 |
+| **Control mapping** | Consent/lawful-basis management (ISO A.5.34 / SOC 2 P-series) |
+| **Priority** | P0 |
+| **Affected systems** | `web-app`, `api`, `consent-svc` (new) |
+
+**Requirement statement:** Build a dedicated "My Data" portal in `web-app` where data principals can: view what personal data is held, request correction/update/completion (OBL-026), request erasure (OBL-027), and exercise all rights under the Act. The means to make a rights request must be prominently published (OBL-048).
+
+**Acceptance criteria:**
+- `web-app` has a `/my-data` route (POST-login) showing a summary of: account data, consent status per purpose, data shared with third parties, and a timeline of rights exercised.
+- "Correct my data" form allows the user to submit corrections; triggers a review workflow that updates `user-db` and notifies user on completion.
+- "Request erasure" button triggers REQ-5 pipeline; shows confirmation with ETA.
+- Rights request form is accessible without login for non-authenticated data principals (email-based verification).
+- The `/my-data` page and the rights request form are linked from the app footer and from every consent/notice screen.
+- All rights-request activity is logged with user_id, request_type, timestamp, status, resolution.
+
+---
+
+### REQ-7: Grievance Redressal System
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-017, OBL-028, OBL-049 |
+| **Control mapping** | Consent/lawful-basis management (ISO A.5.34 / SOC 2 P-series) |
+| **Priority** | P1 |
+| **Affected systems** | `web-app`, `api`, `consent-svc` (new) |
+
+**Requirement statement:** Establish an effective mechanism to receive, track, and respond to data principal grievances within 90 days (OBL-017, OBL-028). The mechanism must be prominently published on the website/app (OBL-049).
+
+**Acceptance criteria:**
+- `web-app` has a `/grievance` page with a submission form (captcha-protected, supports attachments).
+- Grievance is assigned a unique ticket ID; the principal can check status via a public status page (ticket ID + email OTP).
+- Backend implements a case-management workflow: `received` → `under-review` → `resolved` → `closed`.
+- SLA monitoring: automatic escalation if response exceeds 90 days (send alert to DPO + legal team).
+- All grievance interactions logged: timestamps, handler assignments, responses sent.
+- Published prominently in app footer, consent screens, and DPO contact page.
+- Monthly report: count of grievances, average resolution time, % resolved within 90 days.
+
+---
+
+### REQ-8: Encryption-at-Rest Remediation
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-013, OBL-034 |
+| **Control mapping** | Encryption (ISO A.8.24 / SOC 2 CC6.6–CC6.7 / NIST SC-13, SC-28) |
+| **Priority** | P0 |
+| **Affected systems** | `events`, `blob-store` (legacy bucket), `cache` |
+
+**Requirement statement:** Remediate known encryption-at-rest gaps in `events` (unencrypted Kafka topics), `blob-store` (legacy bucket without encryption), and `cache` (Redis without encryption), as identified in the system inventory. Rule 6 mandates encryption as a reasonable security safeguard.
+
+**Acceptance criteria:**
+- `events` (Kafka): all topics carrying PII are moved to encrypted-at-rest brokers; topic-level encryption or at-rest cluster encryption enabled. Legacy topics purged or replayed through encrypted pipeline.
+- `blob-store` legacy bucket: enable S3 server-side encryption (AES-256) on all existing and new objects. Backfill policy: all existing unencrypted objects are re-encrypted within 7 days.
+- `cache` (Redis): Enable Redis at-rest encryption (AOF/RDB files) and in-transit TLS. TTL remains at existing values.
+- Encryption keys managed via AWS KMS with automatic rotation (1-year rotation policy).
+- Compliance report: automated scan confirms 100% of PII-storing resources have encryption-at-rest enabled.
+
+---
+
+### REQ-9: Logging, Monitoring & Retention Enhancement
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-034, OBL-039 |
+| **Control mapping** | Logging & monitoring (ISO A.8.15–A.8.16 / SOC 2 CC7.2 / NIST AU-2, AU-6, SI-4); Data retention & deletion (ISO A.8.10 / MP-6) |
+| **Priority** | P1 |
+| **Affected systems** | `logs`, `api`, `events`, `user-db` |
+
+**Requirement statement:** Extend CloudWatch log retention from the current 90 days to at least 1 year (OBL-039: minimum retention of personal data, traffic data, and other logs). Implement access control on logs and ensure logs include identity, timestamp, event type, and outcome for auditability (OBL-034).
+
+**Acceptance criteria:**
+- `logs` (CloudWatch) log-group retention policy updated from 90 days to 400 days (1 year + buffer).
+- Structured logging format adopted across `api`: JSON with `{timestamp, user_id (masked), event_type, resource, outcome, request_id}`.
+- `events` Kafka audit log and `user-db` query log included in the 1-year retention scope (via S3 export with lifecycle policy for log-tier).
+- Access to raw logs restricted to Security/DevOps roles; audit log (who accessed logs) maintained separately.
+- Automated retention compliance check runs weekly: alerts if any log group has retention < 365 days.
+- Cost analysis: log storage costs projected; archival to S3 Glacier after 90 days, held for 1 year total.
+
+---
+
+### REQ-10: Verifiable Parental Consent & Child Data Safeguards
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-018, OBL-019, OBL-020, OBL-041 |
+| **Control mapping** | Consent/lawful-basis management (ISO A.5.34 / SOC 2 P-series); Access control (ISO A.8.3 / A.5.15 / SOC 2 CC6.1 / NIST AC-2, AC-6) |
+| **Priority** | P1 |
+| **Affected systems** | `web-app`, `api`, `user-db`, `consent-svc` (new) |
+
+**Requirement statement:** Before processing the personal data of a child (under 18), obtain verifiable consent of the parent or lawful guardian (OBL-018, OBL-041). Prohibit detrimental processing (OBL-019), tracking/monitoring (OBL-020), and targeted advertising directed at children.
+
+**Acceptance criteria:**
+- Age gating: collection of date of birth at registration; any user indicating <18 enters a guardian-consent flow.
+- Guardian verification (OBL-041): the guardian must provide verifiable identity/age details or a virtual token from a digiLocker/authorised entity. Accept: Aadhaar (e-KYC virtual ID), PAN, digiLocker token, or credit-card age verification.
+- Guardian consent: the guardian receives and signs a consent notice (REQ-1) on behalf of the minor; guardian contact info and relationship recorded.
+- If the user is verified as <18 and guardian consent is not obtained, the account is restricted: no data processing beyond age-verification.
+- Tracking & targeted advertising (OBL-020): the `events` pipeline tags any event belonging to a <18 user; a filter drops any tracking/behavioural-monitoring and targeted-advertising events for that cohort.
+- Detrimental processing (OBL-019): content moderation pipeline flags content delivered to <18 users for safety review.
+- Integration test: a simulated <18 user — events pipeline produces no behavioural-tracking events; no ad-tech segments generated.
+
+---
+
+### REQ-11: DPO Contact Publication & Notification
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-016, OBL-040 |
+| **Control mapping** | Consent/lawful-basis management (ISO A.5.34 / SOC 2 P-series) |
+| **Priority** | P1 |
+| **Affected systems** | `web-app`, `api` |
+
+**Requirement statement:** Prominently publish the business contact information of the Data Protection Officer (DPO) — or the person able to answer questions about data processing — on the website/app (OBL-016, OBL-040). Include in every communication related to rights exercise.
+
+**Acceptance criteria:**
+- DPO contact (email, phone, postal address) displayed on a `/dpo` page, in the footer of every page, on the consent notice screen, on the rights portal, and on the grievance page.
+- Every automated email/SMS communication (consent confirmation, rights acknowledgment, breach notification) includes the DPO contact block.
+- DPO contact is configurable via admin panel (no code deploy to change).
+- The `/dpo` page meets WCAG 2.1 AA accessibility standards.
+
+---
+
+### REQ-12: Data Processor Contract & Compliance Management
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-010 |
+| **Control mapping** | Third-party/processor controls (ISO A.5.19–A.5.22 / SOC 2 CC9.2 / NIST SA-9) |
+| **Priority** | P1 |
+| **Affected systems** | `api`, `analytics` (Snowflake), `logs` (CloudWatch as third-party infra) |
+
+**Requirement statement:** Engage any Data Processor only under a valid contract that governs the processing of personal data related to the offering of goods or services (OBL-010). Maintain an inventory of all Data Processors and the associated Data Processing Agreements (DPAs).
+
+**Acceptance criteria:**
+- An admin module lists all current Data Processors: AWS (infra), Snowflake (analytics), any SaaS sub-processors.
+- Each processor has an associated DPA record: contract reference, effective date, termination date, data categories processed, processing instructions, audit rights clause.
+- DPA template available that includes: subject-matter, duration, nature/purpose of processing, type of personal data, categories of data principals, obligations/rights of the Data Fiduciary.
+- New processor onboarding requires DPA signing before API calls to that processor are permitted (gating in procurement/engineering workflow).
+- Annual review reminder: each DPA flagged for 12-month review.
+
+---
+
+### REQ-13: Data Accuracy & Quality Pipeline
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-011 |
+| **Control mapping** | Access control / data quality (ISO A.8.3 / AC-2, AC-6 — data quality as procedural control) |
+| **Priority** | P2 |
+| **Affected systems** | `user-db`, `api`, `analytics` |
+
+**Requirement statement:** Ensure that personal data which is likely to be used to make a decision affecting a data principal, or disclosed to another Data Fiduciary, is complete, accurate, and kept up to date (OBL-011).
+
+**Acceptance criteria:**
+- Scheduled data quality job runs weekly against `user-db`:
+  - Detect stale records (no update in 6 months) → flag for review.
+  - Detect incomplete profiles (missing required PII fields) → trigger user outreach (email/SMS asking to verify).
+  - Detect format anomalies (invalid email/phone patterns) → quarantine for manual review.
+- Data quality score trend is tracked and reported to DPO monthly.
+- When data is disclosed to another Data Fiduciary, a "data quality attestation" flag is set in the disclosure record.
+- API endpoints that serve data to third parties (webhooks, Data Processor integration) include a `data_quality_checked` header/property indicating when the data was last validated.
+
+---
+
+### REQ-14: Nomination Feature
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-029, OBL-050 |
+| **Control mapping** | Consent/lawful-basis management (ISO A.5.34 / SOC 2 P-series) |
+| **Priority** | P2 |
+| **Affected systems** | `web-app`, `api`, `user-db` |
+
+**Requirement statement:** Provide a means for data principals to nominate one or more individuals to exercise their rights under the Act in the event of their death or incapacity (OBL-029, OBL-050).
+
+**Acceptance criteria:**
+- `/my-data/nominees` page in `web-app` where the user adds/removes nominees: name, relationship, email, phone.
+- Nominee verification: nominee must accept the nomination (email confirmation link or SMS OTP) before being activated.
+- When a nominee exercises a right (e.g. erasure request), the system verifies: (a) nominee is on active nominee list for that user, (b) proof of death/incapacity is provided (document upload), (c) a review workflow processes the request.
+- Nominee list is stored in `user-db` (new `nominees` table, FK → user_id).
+- Maximum 5 nominees per user.
+
+---
+
+### REQ-15: Cross-Border Data Transfer Controls
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-047, OBL-051 |
+| **Control mapping** | Data classification & inventory (ISO A.5.9 / A.5.12 / SOC 2 CC3.2 / NIST RA-2, CM-8); Third-party/processor controls (NIST SA-9) |
+| **Priority** | P2 |
+| **Affected systems** | `api`, `analytics` (Snowflake), `blob-store`, `events` |
+
+**Requirement statement:** Implement controls to ensure that personal data (and, for Significant Data Fiduciaries, specified personal data) is not transferred outside India except in compliance with restrictions specified by the Central Government (OBL-051, OBL-047).
+
+**Acceptance criteria:**
+- Data residency mapping: document where each system's data physically resides (all systems currently in `ap-south-1` — conformant, but add a monitoring guardrail).
+- If any system is deployed to a region outside India in future, a "cross-border transfer" flag must be set and a mechanism (consent/contract/adequacy determination) applied.
+- For SDFs: when Government specifies restricted data categories (OBL-047), add a data-loss-prevention rule: blocked at network level (S3 bucket policy, Kafka mirroring blocker).
+- API gateway layer: if a downstream processor is outside India, the DPA must include Standard Contractual Clauses or equivalent mechanism.
+- Quarterly scan: automated report of all data egress cross-border; alert if any egress lacks a documented transfer mechanism.
+
+---
+
+### REQ-16: DPIA & Audit Workflow (Significant Data Fiduciary)
+
+| Field | Value |
+|---|---|
+| **Obligations** | OBL-021, OBL-022, OBL-023, OBL-024, OBL-044, OBL-045, OBL-046 |
+| **Control mapping** | Data classification & inventory (ISO A.5.9 / A.5.12); Incident/breach response (ISO A.5.24–A.5.28); Access control (ISO A.8.3) |
+| **Priority** | P2 |
+| **Affected systems** | `web-app`, `api`, `user-db`, `consent-svc` (new) |
+
+**Requirement statement:** If the org is or becomes a Significant Data Fiduciary (SDF), appoint a DPO (OBL-021) and independent data auditor (OBL-022), conduct a Data Protection Impact Assessment (DPIA) every 12 months (OBL-023, OBL-044), conduct a periodic audit every 12 months (OBL-024, OBL-044), furnish significant observations to the Board (OBL-045), and perform an algorithmic risk assessment (OBL-046).
+
+**Acceptance criteria:**
+- Admin module tracks: DPO details (name, contact, appointment date), independent auditor (firm, engagement period, last audit date).
+- DPIA template workflow: guide the responsible team through a structured DPIA (data flow mapping → risk identification → mitigation plan → sign-off). Output stored as a versioned document in `blob-store`.
+- Audit scheduling: calendar-based reminder 90 days before the 12-month deadline. Audit report upload + Board-submission PDF generation.
+- Algorithmic risk assessment (OBL-046): for any model/algorithm serving content or decisions to data principals, a risk assessment checklist must be completed before deployment. The assessment evaluates: bias, transparency, impact on data principal rights, recourse mechanism.
+- Furnish-to-Board report: auto-generated PDF from DPIA/audit findings. Placeholder for future electronic submission to the Board system.
+- All artefacts (DPIA, audit report, algorithmic assessments) retained for 5 years.
+
+---
+
+## Priority Summary
+
+| Priority | Count | Requirements |
+|---|---|---|
+| **P0** | 7 | REQ-1, REQ-2, REQ-4, REQ-5, REQ-6, REQ-8, (must-ship) |
+| **P1** | 6 | REQ-3, REQ-7, REQ-9, REQ-10, REQ-11, REQ-12 |
+| **P2** | 3 | REQ-13, REQ-14, REQ-15, REQ-16 |
+
+## Dependency Map
+
+```
+REQ-1 (consent-svc) ─┬─ REQ-2 (withdrawal) ─── REQ-5 (erasure)
+                      ├─ REQ-3 (languages) 
+                      ├─ REQ-6 (rights portal)
+                      ├─ REQ-7 (grievance)
+                      ├─ REQ-10 (child data)
+                      └─ REQ-11 (DPO contact)
+                      
+REQ-8 (encryption)    ─── REQ-4 (breach detection) ─── REQ-9 (log retention)
+
+REQ-6 (rights portal) ─── REQ-14 (nomination) ─── REQ-13 (data quality)
+
+REQ-16 (DPIA/audit) and REQ-12 (processor contracts) and REQ-15 (cross-border) are independent.
+```
+
+REQ-1 (consent-svc) is the foundational build. REQ-2, REQ-5, REQ-10, and REQ-6 all depend on it. REQ-4 and REQ-8 are independent security prerequisites that can run in parallel with consent-svc development.
