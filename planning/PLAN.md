@@ -1,13 +1,14 @@
 # PLAN — Compliance Disco
 
-High-level build plan for the team. **This file = the "what & why" and phase sequencing.**
-Per-slice execution detail lives in each owner's `TODO.md` (linked below). Don't duplicate
-task detail here.
+**This file = the PM / strategy / ownership layer** (phases, scoring strategy, who owns what,
+tracking). **Architecture & workflow are the single source of truth in `/AGENTS.md` and
+`/WORKFLOW.md`** — this PLAN does not re-describe them. Per-slice task detail lives in each
+owner's `TODO.md` under `planning/`.
 
 ## The product (one line)
-How an organisation complies with a complex regulation: a **multi-agent fan-out** — CCO
-de-legalese → department specialists (marketing / finance / **engineering** / legal / …)
-→ collator → **FDO** (Final Determination of Obligations) → circulate for feedback & sign-off.
+Reads a complex regulation and produces compliance artifacts via a **five-agent pipeline**
+(see `/AGENTS.md`): regulatory-reader → coordinator → {marketing, engineering} in parallel
+→ consolidator → final report.
 
 Regulation for the build: **India DPDP Act 2023 + Rules 2025** (`docs/regulations/dpdp/`).
 
@@ -38,23 +39,21 @@ Locked track: **AI as Agency** (164 base). Strategy, straight from the rubric:
 | 4 · Proof | hr 6–8 | real runs on real surface; trace/cost visible; eval set; backup run; rehearse demo | all |
 
 ## Slices & owners
-| Slice | Path | Owner |
-| --- | --- | --- |
-| Orchestrator / CCO (de-legalese + dynamic delegation) | `agents/orchestrator/` | TBD |
-| **Engineering specialist** | [`agents/eng-compliance/TODO.md`](agents/eng-compliance/TODO.md) | **(you)** |
-| Marketing specialist | `agents/marketing/` | TBD |
-| Finance specialist | `agents/finance/` | TBD |
-| Legal specialist | `agents/legal/` | TBD |
-| Collator → FDO + sign-off flow | `agents/collator/` | TBD |
-| Frontend / real URL / observability | `app/` | TBD |
+Agent definitions live in `agents/<name>/`; per-slice tracking lives in `planning/<name>/`.
+| Agent (`agents/…`) | Role | Tracking | Owner |
+| --- | --- | --- | --- |
+| `regulatory-reader` | de-legalese → structured obligations | — | TBD |
+| `coordinator` | orchestrate + dispatch (aim for dynamic delegation) | — | TBD |
+| `marketing-agent` | marketing compliance artifacts | — | TBD |
+| `engineering-agent` | **engineering compliance artifacts** | [`planning/engineering/TODO.md`](engineering/TODO.md) | **(you)** |
+| `consolidator` | merge + validate → final report | — | TBD |
 
-## Shared contracts (align in Phase 2 — these are the seams)
-- **Obligation** (orchestrator → specialists):
-  `{ obligation_id, text, deadline, severity, affected_depts[] }`
-- **Assessment** (specialist → collator): per-slice schema; engineering's is in its README.
-  Collator must treat each specialist's framework/provision citations as authoritative.
-- **FDO** (collator output): merged assessments + conflicts section + per-clause citations
-  + sign-off tracker.
+## Shared contracts (align early — these are the seams)
+Handoffs are filesystem-based via `workspace/shared-data/` (see `/WORKFLOW.md`).
+- **Obligation** (reader → agents): `{ obligation_id, text, deadline, severity, affected_depts[] }`
+- **Engineering assessment** schema: `planning/engineering/README.md`. Consolidator should
+  treat each agent's framework/provision citations as authoritative.
+- **Final report** (consolidator): merged outputs + conflicts section + per-clause citations.
 
 ## Demo (4 min, live, not recorded)
 0:00 context · 0:20 live core loop (one obligation happy path + one edge case) · 2:00 proof

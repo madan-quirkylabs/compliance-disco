@@ -37,11 +37,11 @@ The coordinator:
 - `faq.md` — frequently asked questions
 - `blog-post.md` — announcement/blog content
 
-**Engineering Agent** produces:
-- `data-classification.md` — data categories under DPDP
-- `consent-architecture.md` — consent management design
-- `dpia-template.md` — Data Protection Impact Assessment template
-- `implementation-guide.md` — technical implementation steps
+**Engineering Agent** produces (regulation-agnostic; DPDP shown as the example flow):
+- `data-classification.md` — data/asset categories the regulation governs
+- `control-architecture.md` — technical design for the regulation's core controls (e.g. consent for privacy regs)
+- `impact-assessment-template.md` — the assessment the regulation requires (e.g. a DPIA)
+- `implementation-guide.md` — phased technical implementation steps
 
 ### Stage 4: Consolidation
 **Agent:** `hermes-consol` (Consolidator)
