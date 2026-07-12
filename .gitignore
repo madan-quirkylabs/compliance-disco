@@ -23,3 +23,7 @@ workspace/shared-data/run-history/*
 docs/regulations/**/*.txt
 consolidated-output/*.md
 !**/.gitkeep
+
+# Python bytecode
+__pycache__/
+*.pyc
