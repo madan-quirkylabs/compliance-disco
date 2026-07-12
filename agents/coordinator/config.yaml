@@ -1,20 +1,40 @@
 # Hermes config for: coordinator
+# Main orchestration profile — runs the full pipeline
 
 model:
   provider: openai-api
   default: gpt-5.6-sol
 
+fallback_providers:
+  - provider: openrouter
+    model: anthropic/claude-sonnet-5
+
+auxiliary:
+  compression:       { provider: openrouter, model: google/gemini-3-flash-preview }
+  background_review: { provider: openrouter, model: google/gemini-3-flash-preview }
+  goal_judge:        { provider: openrouter, model: google/gemini-3-flash-preview }
+
 terminal:
-  backend: local
+  backend: docker
+  docker_image: "nikolaik/python-nodejs:python3.11-nodejs20"
+  docker_network: true
+  docker_volumes:
+    - "/workspace"
+
+compression:
+  enabled: true
+  threshold: 0.50
+  protect_last_n: 20
 
 agent:
-  max_turns: 80
+  max_turns: 90
+  tool_loop_guardrails:
+    warnings_enabled: true
+    hard_stop_enabled: true
 
-tool_loop_guardrails:
-  hard_stop_enabled: true
+skills:  { write_approval: false }
+memory:  { write_approval: false }
 
-skills:
-  write_approval: false
-
-memory:
-  write_approval: false
+cron:
+  wrap_response: false
+  script_timeout_seconds: 1800

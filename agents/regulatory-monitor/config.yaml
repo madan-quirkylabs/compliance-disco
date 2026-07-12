@@ -1,18 +1,19 @@
+# Hermes config for: regulatory-monitor
+# This profile runs via cron — must use docker backend
+
 model:
   provider: openai-api
   default: gpt-5.6-sol
 
 terminal:
-  backend: local
+  backend: docker
+  docker_image: "nikolaik/python-nodejs:python3.11-nodejs20"
+  docker_network: true
 
 agent:
   max_turns: 40
+  tool_loop_guardrails:
+    hard_stop_enabled: true
 
-tool_loop_guardrails:
-  hard_stop_enabled: true
-
-skills:
-  write_approval: false
-
-memory:
-  write_approval: false
+skills:  { write_approval: false }
+memory:  { write_approval: false }
