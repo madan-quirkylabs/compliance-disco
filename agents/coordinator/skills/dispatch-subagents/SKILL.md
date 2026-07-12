@@ -10,49 +10,64 @@ metadata:
 # Dispatch Subagents
 
 ## When to Use
-When the coordinator needs to invoke parallel worker agents. Trigger: "dispatch", "fan out", "invoke agents".
+When the coordinator needs to invoke parallel worker agents after reader extraction is complete.
+
+## How delegate_task Works
+
+`delegate_task` spawns ephemeral subagents **within the current session**. The subagent
+inherits the parent's context (SOUL, memory, tools) but runs independently. Use it to
+fan out work in parallel without leaving the coordinator session.
 
 ## Procedure
-1. Read the monitor or reader handoff to determine:
-   - `regulation_name` — e.g., "DPDP Act 2023", "SEBI Circular 2026-045"
-   - `source_body` — e.g., "SEBI", "AMFI", "DPDP Board"
-2. Read extracted regulations from `workspace/shared-data/extracted-regulations/`.
-3. Write targeted dispatch instructions:
-   - `workspace/shared-data/handoffs/coord-to-marketing.md` — marketing-specific context
-   - `workspace/shared-data/handoffs/coord-to-engineering.md` — engineering-specific context
-4. Each dispatch file MUST include:
-   - `regulation_name` and `source_body`
-   - What files to read as input
-   - What output files to produce
-   - Where to write outputs
+
+1. Read `regulation_name` and `source_body` from the reader handoff.
+2. Invoke Marketing Agent via `delegate_task` with a self-contained prompt.
+3. Invoke Engineering Agent via `delegate_task` with a self-contained prompt.
+4. Both prompts MUST include:
+   - The regulation name and source body
+   - Where to read input files from
+   - Where to write output files to
    - Which handoff file to signal completion
-5. Invoke `delegate_task` for each agent with their dispatch file as context.
 
-## Dispatch Template
-```markdown
-# {Agent} Agent Dispatch
+## Marketing Prompt Template
+```
+You are the Marketing Agent. Produce customer-facing compliance content.
 
-## Regulation
-- **Name:** {regulation_name}
-- **Source Body:** {source_body}
+Regulation: {regulation_name}
+Source Body: {source_body}
 
-## Source Data
-- `workspace/shared-data/extracted-regulations/obligations.json`
-- `workspace/shared-data/extracted-regulations/summary.md`
-- `workspace/shared-data/extracted-regulations/penalties.json`
-- `workspace/shared-data/extracted-regulations/definitions.json`
-- `workspace/shared-data/extracted-regulations/timelines.json`
+Read extracted data from workspace/shared-data/extracted-regulations/
+and produce 4 files in workspace/shared-data/marketing-output/:
+- compliance-guide.md
+- checklist.md
+- faq.md
+- blog-post.md
 
-## Produce
-- `workspace/shared-data/{agent}-output/{file1}.md`
-- `workspace/shared-data/{agent}-output/{file2}.md`
-- ...
+When done, write handoff to workspace/shared-data/handoffs/marketing-to-consolidator.md
+with status "complete", regulation_name, source_body, and list of artifacts.
+```
 
-## Completion
-- Write handoff to `workspace/shared-data/handoffs/{agent}-to-consolidator.md`
+## Engineering Prompt Template
+```
+You are the Engineering Agent. Produce technical compliance artifacts.
+
+Regulation: {regulation_name}
+Source Body: {source_body}
+
+Read extracted data from workspace/shared-data/extracted-regulations/
+and grounding references from agents/engineering-agent/skills/build-compliance-artifacts/references/
+
+Produce 4 files in workspace/shared-data/engineering-output/:
+- data-classification.md
+- control-architecture.md
+- impact-assessment-template.md
+- implementation-guide.md
+
+When done, write handoff to workspace/shared-data/handoffs/engineering-to-consolidator.md
+with status "complete", regulation_name, source_body, and list of artifacts.
 ```
 
 ## Pitfalls
-- Don't overload a single delegate_task with both agents — use separate calls.
-- Include enough context in dispatch files that agents don't need to guess paths.
-- Always pass `regulation_name` — agents need it to produce regulation-specific output.
+- Each delegate_task call is a separate subagent — they don't see each other's work.
+- Include ALL necessary context in the prompt — subagents can't ask you questions mid-run.
+- If a subagent fails, you can retry with the same or modified prompt.
