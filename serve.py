@@ -268,7 +268,7 @@ loadReports();
 
 
 def main():
-    srv = http.server.ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
+    srv = http.server.ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
     print(f"Compliance-Disco UI → http://localhost:{PORT}  (Ctrl-C to stop)")
     try:
         srv.serve_forever()

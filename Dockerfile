@@ -2,7 +2,7 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies for pymupdf
 RUN apt-get update && apt-get install -y \
     gcc \
     && rm -rf /var/lib/apt/lists/*
@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose port
-EXPOSE 9000
+EXPOSE 8000
 
-# Run the server
-CMD ["python", "server.py"]
+# Run the stdlib server (no FastAPI dependency)
+CMD ["python", "serve.py"]
