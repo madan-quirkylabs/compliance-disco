@@ -1,0 +1,6 @@
+{
+  "obligation_id": "D-06",
+  "text": "When a Data Principal withdraws consent or the purpose is served, the Data Fiduciary must erase their personal data across all systems and cause its Data Processors to do the same, unless retention is required by law.",
+  "deadline": "2026-09-01",
+  "severity": "high"
+}
