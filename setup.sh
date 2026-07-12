@@ -27,6 +27,22 @@ fi
 echo "Hermes version: $(hermes --version 2>/dev/null || echo 'unknown')"
 echo ""
 
+# ── Check ds4-server is running ──────────────────────────────────────
+
+echo "━━━ Checking ds4-server ━━━"
+DS4_HOST="${DS4_HOST:-172.17.0.1}"
+DS4_PORT="${DS4_PORT:-8000}"
+if curl -sf "http://${DS4_HOST}:${DS4_PORT}/v1/models" >/dev/null 2>&1; then
+  echo "  ✓ ds4-server reachable at http://${DS4_HOST}:${DS4_PORT}"
+  DS4_MODEL=$(curl -sf "http://${DS4_HOST}:${DS4_PORT}/v1/models" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data'][0]['id'])" 2>/dev/null || echo "deepseek-v4-flash")
+  echo "  ✓ Detected model: $DS4_MODEL"
+else
+  echo "  ⚠  ds4-server not reachable at http://${DS4_HOST}:${DS4_PORT}"
+  echo "     Start it first:  ./ds4-server --ctx 100000"
+  echo "     Continuing setup anyway (config will point to ds4-server)..."
+fi
+echo ""
+
 # ── Create profiles using hermes profile create ──────────────────────
 
 # The coordinator is the main profile. Other agents are invoked by the
@@ -84,26 +100,23 @@ echo ""
 
 # ── Generate config.yaml ─────────────────────────────────────────────
 
-cat > "$COORD_HOME/config.yaml" << 'EOF'
+cat > "$COORD_HOME/config.yaml" << EOF
 # Compliance-Disco — Coordinator Config
+# Backend: ds4-server (DeepSeek V4 Flash) at http://${DS4_HOST}:${DS4_PORT}
 
 model:
-  provider: openai-api
-  default: gpt-5.6-sol
-
-fallback_providers:
-  - provider: openrouter
-    model: anthropic/claude-sonnet-5
-
-auxiliary:
-  compression:       { provider: openrouter, model: google/gemini-3-flash-preview }
-  background_review: { provider: openrouter, model: google/gemini-3-flash-preview }
-  goal_judge:        { provider: openrouter, model: google/gemini-3-flash-preview }
+  provider: custom
+  default: ${DS4_MODEL:-deepseek-v4-flash}
+  base_url: "http://${DS4_HOST}:${DS4_PORT}/v1"
+  api_key: "ds4-local"
+  context_length: 100000
 
 terminal:
   backend: docker
   docker_image: "nikolaik/python-nodejs:python3.11-nodejs20"
   docker_network: true
+  docker_extra_hosts:
+    - "host.docker.internal:host-gateway"
   docker_volumes:
     - "/workspace"
 
@@ -130,14 +143,12 @@ echo "Generated config.yaml → $COORD_HOME/config.yaml"
 # ── Generate .env template ───────────────────────────────────────────
 
 if [[ ! -f "$COORD_HOME/.env" ]]; then
-  cat > "$COORD_HOME/.env" << 'EOF'
-# API Keys — fill in before running
-OPENAI_API_KEY=sk-your-key-here
-# ANTHROPIC_API_KEY=sk-ant-your-key-here
-# OPENROUTER_API_KEY=sk-or-your-key-here
+  cat > "$COORD_HOME/.env" << EOF
+# ds4-server backend (no API keys needed for local inference)
+DS4_HOST=${DS4_HOST:-172.17.0.1}
+DS4_PORT=${DS4_PORT:-8000}
 EOF
-  echo "Created .env template → $COORD_HOME/.env"
-  echo "  ⚠  Fill in your API keys before running!"
+  echo "Created .env → $COORD_HOME/.env"
 else
   echo "ℹ .env already exists, skipping"
 fi
@@ -206,7 +217,8 @@ echo "║   Setup Complete ✓                                ║"
 echo "╚═══════════════════════════════════════════════════╝"
 echo ""
 echo "Next steps:"
-echo "  1. Fill in API keys: $COORD_HOME/.env"
+echo "  1. Start ds4-server (if not already running):"
+echo "       ./ds4-server --ctx 100000 --port ${DS4_PORT:-8000}"
 echo "  2. Install the gateway (required for cron):"
 echo "       hermes gateway install"
 echo "  3. Test the pipeline manually:"

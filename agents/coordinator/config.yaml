@@ -1,23 +1,20 @@
 # Hermes config for: coordinator
 # Main orchestration profile — runs the full pipeline
+# Uses local ds4-server (DeepSeek V4 Flash) at http://127.0.0.1:8000
 
 model:
-  provider: openai-api
-  default: gpt-5.6-sol
-
-fallback_providers:
-  - provider: openrouter
-    model: anthropic/claude-sonnet-5
-
-auxiliary:
-  compression:       { provider: openrouter, model: google/gemini-3-flash-preview }
-  background_review: { provider: openrouter, model: google/gemini-3-flash-preview }
-  goal_judge:        { provider: openrouter, model: google/gemini-3-flash-preview }
+  provider: custom
+  default: deepseek-v4-flash
+  base_url: "http://172.17.0.1:8000/v1"
+  api_key: "ds4-local"
+  context_length: 100000
 
 terminal:
   backend: docker
   docker_image: "nikolaik/python-nodejs:python3.11-nodejs20"
   docker_network: true
+  docker_extra_hosts:
+    - "host.docker.internal:host-gateway"
   docker_volumes:
     - "/workspace"
 
