@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as RunsRouteImport } from './routes/runs'
 import { Route as FdoRouteImport } from './routes/fdo'
 import { Route as ComplianceRouteImport } from './routes/compliance'
@@ -17,6 +18,11 @@ import { Route as RunsRunIdRouteImport } from './routes/runs_.$runId'
 import { Route as DepartmentsDeptRouteImport } from './routes/departments.$dept'
 import { Route as ComplianceItemIdRouteImport } from './routes/compliance_.$itemId'
 
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RunsRoute = RunsRouteImport.update({
   id: '/runs',
   path: '/runs',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/compliance': typeof ComplianceRoute
   '/fdo': typeof FdoRoute
   '/runs': typeof RunsRoute
+  '/welcome': typeof WelcomeRoute
   '/compliance/$itemId': typeof ComplianceItemIdRoute
   '/departments/$dept': typeof DepartmentsDeptRoute
   '/runs/$runId': typeof RunsRunIdRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/compliance': typeof ComplianceRoute
   '/fdo': typeof FdoRoute
   '/runs': typeof RunsRoute
+  '/welcome': typeof WelcomeRoute
   '/compliance/$itemId': typeof ComplianceItemIdRoute
   '/departments/$dept': typeof DepartmentsDeptRoute
   '/runs/$runId': typeof RunsRunIdRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/compliance': typeof ComplianceRoute
   '/fdo': typeof FdoRoute
   '/runs': typeof RunsRoute
+  '/welcome': typeof WelcomeRoute
   '/compliance_/$itemId': typeof ComplianceItemIdRoute
   '/departments/$dept': typeof DepartmentsDeptRoute
   '/runs_/$runId': typeof RunsRunIdRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/compliance'
     | '/fdo'
     | '/runs'
+    | '/welcome'
     | '/compliance/$itemId'
     | '/departments/$dept'
     | '/runs/$runId'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/compliance'
     | '/fdo'
     | '/runs'
+    | '/welcome'
     | '/compliance/$itemId'
     | '/departments/$dept'
     | '/runs/$runId'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/compliance'
     | '/fdo'
     | '/runs'
+    | '/welcome'
     | '/compliance_/$itemId'
     | '/departments/$dept'
     | '/runs_/$runId'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   ComplianceRoute: typeof ComplianceRoute
   FdoRoute: typeof FdoRoute
   RunsRoute: typeof RunsRoute
+  WelcomeRoute: typeof WelcomeRoute
   ComplianceItemIdRoute: typeof ComplianceItemIdRoute
   DepartmentsDeptRoute: typeof DepartmentsDeptRoute
   RunsRunIdRoute: typeof RunsRunIdRoute
@@ -123,6 +136,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/runs': {
       id: '/runs'
       path: '/runs'
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComplianceRoute: ComplianceRoute,
   FdoRoute: FdoRoute,
   RunsRoute: RunsRoute,
+  WelcomeRoute: WelcomeRoute,
   ComplianceItemIdRoute: ComplianceItemIdRoute,
   DepartmentsDeptRoute: DepartmentsDeptRoute,
   RunsRunIdRoute: RunsRunIdRoute,

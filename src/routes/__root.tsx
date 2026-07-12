@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -89,7 +90,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Compliance Disco — DPDP Command Center" },
       {
         property: "og:description",
-        content: "Regulation in, Formal Compliance Document out — with every agent decision inspectable.",
+        content:
+          "Regulation in, Formal Compliance Document out — with every agent decision inspectable.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -121,13 +123,16 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  // The marketing page is public-facing and renders its own chrome, so it opts
+  // out of the dashboard shell (sidebar, stakeholder switcher, regulation bar).
+  const isMarketing = pathname === "/welcome";
 
   return (
     <QueryClientProvider client={queryClient}>
       <ViewModeProvider>
-        <AppShell>
-          <Outlet />
-        </AppShell>
+        {isMarketing ? <Outlet /> : <AppShell><Outlet /></AppShell>}
         <Toaster richColors position="top-right" />
       </ViewModeProvider>
     </QueryClientProvider>
