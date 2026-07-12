@@ -13,6 +13,7 @@ Track: **AI as Agency**. My agent = a named specialist in the org-structure para
 - [x] Control catalog mapped to DPDP Act 2023 + Rules 2025 (`references/controls.md`)
 - [x] Input/output contract defined (`README.md`)
 - [x] Verified mechanism works; fixed input-echo with the "don't parrot" prompt pattern
+- [x] Vendored the skill into the repo (`skills/eng-compliance/`), loaded via `external_dirs`
 
 ## 🔜 Now (my slice — no dependencies)
 - [ ] Replace mock `system-inventory.md` with our real/target architecture (biggest quality lever)

@@ -4,13 +4,25 @@ My slice of the compliance fan-out: the **engineering perspective** specialist.
 Takes one DPDP obligation → returns a structured engineering impact assessment.
 
 ## Where the logic lives
-The agent is a Hermes skill (registered globally), not code in this repo:
-- `~/.hermes/skills/eng-compliance/SKILL.md` — procedure + output schema
-- `~/.hermes/skills/eng-compliance/references/controls.md` — DPDP + control mapping
-- `~/.hermes/skills/eng-compliance/references/system-inventory.md` — systems to ground against
+The agent is a Hermes skill, **vendored in the repo** at `skills/eng-compliance/`:
+- `skills/eng-compliance/SKILL.md` — procedure + output schema
+- `skills/eng-compliance/references/controls.md` — DPDP + control mapping
+- `skills/eng-compliance/references/system-inventory.md` — systems to ground against
 
 Grounding lives *inside the skill* on purpose — a project-root `AGENTS.md`/`.hermes.md`
 would shadow a local context file (only the first project context loads per session).
+
+## Setup (each teammate, once)
+Point Hermes at the repo's vendored skills, then confirm it loads:
+```yaml
+# ~/.hermes/config.yaml
+skills:
+  external_dirs:
+    - /absolute/path/to/compliance-disco/skills
+```
+```bash
+hermes skills list | grep eng-compliance   # should show it as enabled
+```
 
 ## Input contract (from the orchestrator / de-legalese step)
 ```json
