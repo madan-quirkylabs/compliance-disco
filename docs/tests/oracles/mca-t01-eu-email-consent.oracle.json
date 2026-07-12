@@ -1,0 +1,17 @@
+{
+  "scenario_id": "MCA-T01",
+  "test_id": "MCA-T01",
+  "input": "scenarios/mca-t01-eu-email-consent.input.json",
+  "primary_behavior": "Evidence-backed positive path: an applicable control with complete evidence.",
+  "expected_outcome": {
+    "applicability_status": "applicable",
+    "assessment_status": "compliant",
+    "risk": "low",
+    "minimum_confidence": 0.8,
+    "decision_required": null,
+    "affected_practices": ["MKT-EMAIL-EU-001"],
+    "must_quote_practice_evidence": ["consent_method", "consent_evidence", "opt_out_process"],
+    "must_preserve": ["PACK-CONSENT-EU", "1.0.0", "EU-CONSENT-001", "SYNTHETIC-EU-CONSENT-1"]
+  },
+  "notes": "Applicability must be recorded before compliance. Compliant is only correct here because consent evidence, opt-out process, and a recent verification date are all present."
+}

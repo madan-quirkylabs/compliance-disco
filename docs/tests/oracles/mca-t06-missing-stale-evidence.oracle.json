@@ -1,0 +1,28 @@
+{
+  "scenario_id": "MCA-T06",
+  "test_id": "MCA-T06",
+  "input": "scenarios/mca-t06-missing-stale-evidence.input.json",
+  "primary_behavior": "Unknown compliance: applicability is established, but the evidence is absent and stale — which is neither proof of compliance nor proof of failure.",
+  "expected_outcome": {
+    "applicability_status": "applicable",
+    "assessment_status": "unknown",
+    "risk": "medium",
+    "maximum_confidence_exclusive": 0.8,
+    "decision_required": "CCO_review",
+    "affected_practices": ["MKT-SMS-EU-003"],
+    "missing_evidence": ["consent_evidence", "opt_out_process", "current verification evidence"],
+    "must_quote_practice_evidence": [
+      "consent_method",
+      "consent_evidence",
+      "opt_out_process",
+      "last_verified_at"
+    ],
+    "must_preserve": ["PACK-SMS-CONSENT-EU", "1.3.0", "SMS-CONSENT-001", "SYNTHETIC-EU-SMS-2"],
+    "must_not_do": [
+      "treat the owner's verbal report of consent as consent evidence",
+      "mark compliant",
+      "mark non_compliant without demonstrating the control is absent"
+    ]
+  },
+  "notes": "The pairing with MCA-T02 is the point: T02 documents an absent control (non_compliant), T06 documents absent evidence (unknown). The output must request the exact missing artifacts and keep 'we cannot see it' separate from 'it is not there'. last_verified_at is 2024-07-10, roughly two years before the 2026-07-12 assessment date."
+}

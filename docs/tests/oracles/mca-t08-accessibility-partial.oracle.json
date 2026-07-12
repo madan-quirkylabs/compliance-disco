@@ -1,0 +1,33 @@
+{
+  "scenario_id": "MCA-T08",
+  "test_id": "MCA-T08",
+  "input": "scenarios/mca-t08-accessibility-partial.input.json",
+  "primary_behavior": "Partial control: two of three supplied checks pass, one fails, and the verification evidence is complete and current.",
+  "expected_outcome": {
+    "applicability_status": "applicable",
+    "assessment_status": "partial",
+    "risk": "medium",
+    "minimum_confidence": 0.8,
+    "decision_required": null,
+    "affected_practices": ["MKT-WEB-ACCESS-001"],
+    "gap_limited_to": ["image_alt_text"],
+    "must_quote_practice_evidence": [
+      "control_evidence.check_results.keyboard_navigation",
+      "control_evidence.check_results.colour_contrast",
+      "control_evidence.check_results.image_alt_text",
+      "control_evidence.audit_document"
+    ],
+    "must_preserve": [
+      "PACK-WEB-ACCESSIBILITY",
+      "1.2.0",
+      "ACCESSIBILITY-LANDING-001",
+      "SYNTHETIC-ACCESSIBILITY-SECTION-2"
+    ],
+    "must_not_do": [
+      "introduce accessibility criteria that are not in supplied_checks (e.g. screen-reader landmarks, focus order, captions, ARIA roles)",
+      "mark unknown — the audit evidence is complete and current",
+      "mark non_compliant — two of the three supplied checks pass"
+    ]
+  },
+  "notes": "Confidence is at or above 0.80 because the evidence is complete, so no escalation is triggered by the threshold. The Marketing instruction must state the required change (alt text on the 6 campaign images), a verification step, and human-approval labelling. Inventing extra accessibility criteria is the failure mode this scenario hunts for."
+}

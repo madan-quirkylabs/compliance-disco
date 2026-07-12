@@ -1,0 +1,25 @@
+{
+  "scenario_id": "MCA-T04",
+  "test_id": "MCA-T04",
+  "input": "scenarios/mca-t04-future-effective-date.input.json",
+  "primary_behavior": "Temporal applicability rejection: jurisdiction, entity, audience, and channel all match, but the requirement is not yet effective.",
+  "expected_outcome": {
+    "applicability_status": "not_applicable",
+    "applicability_basis": "effective_date_comparison",
+    "assessment_status": "not_applicable",
+    "decision_required": null,
+    "affected_practices": ["MKT-EMAIL-EU-001"],
+    "must_preserve": [
+      "PACK-FUTURE-DISCLOSURE",
+      "1.0.0",
+      "FUTURE-DISCLOSURE-001",
+      "SYNTHETIC-EU-DISCLOSURE-9"
+    ],
+    "must_state": ["effective_from 2027-01-01 is after assessment_date 2026-07-12"],
+    "must_not_do": [
+      "classify compliance beyond not_applicable",
+      "issue a remediation instruction for a requirement that is not yet effective"
+    ]
+  },
+  "notes": "Every applicability condition except time matches, which is the trap: the agent must compare effective_from against assessment_date and stop. Flagging the future date as informational context is acceptable; issuing a remediation instruction is not."
+}

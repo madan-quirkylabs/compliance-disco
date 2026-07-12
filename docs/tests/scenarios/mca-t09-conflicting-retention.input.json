@@ -1,0 +1,109 @@
+{
+  "scenario_id": "MCA-T09",
+  "title": "Partner campaign records assessed against a 24-month contractual retention pack and a 12-month internal deletion pack",
+  "requirement_packs": [
+    {
+      "pack_version": "1.0.0",
+      "regulation_id": "PACK-CONTRACT-PARTNER",
+      "regulation_name": "Synthetic Partner Contract Requirements",
+      "jurisdiction_definitions": {
+        "EU": "Synthetic test jurisdiction; no legal interpretation is implied."
+      },
+      "requirements": [
+        {
+          "requirement_id": "PARTNER-RETENTION-001",
+          "regulation_id": "PACK-CONTRACT-PARTNER",
+          "regulation_name": "Synthetic Partner Contract Requirements",
+          "jurisdiction": ["EU"],
+          "effective_from": "2025-01-01",
+          "title": "Retain partner campaign records for 24 months",
+          "description": "Partner co-marketing campaign records must be retained for 24 months from campaign end so that the partner can audit attribution and spend.",
+          "source_citation": "SYNTHETIC-PARTNER-CONTRACT-5",
+          "topic": "campaign_record_retention",
+          "obligation_type": "required_control",
+          "applicability_conditions": {
+            "entity_types": ["private_entity"],
+            "data_subject_locations": ["EU"],
+            "channels": ["email", "web"]
+          },
+          "likely_departments": ["Marketing"],
+          "priority": "high"
+        }
+      ]
+    },
+    {
+      "pack_version": "4.0.0",
+      "regulation_id": "PACK-INTERNAL-RETENTION",
+      "regulation_name": "Synthetic Internal Data Retention Policy",
+      "jurisdiction_definitions": {
+        "EU": "Synthetic test jurisdiction; no legal interpretation is implied."
+      },
+      "requirements": [
+        {
+          "requirement_id": "POLICY-RETENTION-001",
+          "regulation_id": "PACK-INTERNAL-RETENTION",
+          "regulation_name": "Synthetic Internal Data Retention Policy",
+          "jurisdiction": ["EU"],
+          "effective_from": "2025-01-01",
+          "title": "Delete campaign records after 12 months unless an approved exception exists",
+          "description": "Campaign records in this category must be deleted no later than 12 months after campaign end, unless a documented, approved retention exception is on file for the specific workflow.",
+          "source_citation": "INTERNAL-POLICY-RETENTION-3.1",
+          "topic": "campaign_record_retention",
+          "obligation_type": "required_control",
+          "applicability_conditions": {
+            "entity_types": ["private_entity"],
+            "data_subject_locations": ["EU"],
+            "channels": ["email", "web"]
+          },
+          "likely_departments": ["Marketing"],
+          "priority": "high"
+        }
+      ]
+    }
+  ],
+  "runtime_context": {
+    "organisation": "Northstar Commerce Group (synthetic)",
+    "legal_entity": "Northstar Commerce EU Ltd (synthetic)",
+    "entity_type": "private_entity",
+    "business_unit": "Partner Marketing",
+    "workflow_id": "WF-PARTNER-COMARKETING-007",
+    "campaign_id": "CMP-PARTNER-COMARKETING-2026",
+    "audience_location": "EU",
+    "product": "Synthetic Commerce Platform",
+    "sector": "software",
+    "channel": "email",
+    "assessment_date": "2026-07-12",
+    "requirement_effective_date": "2025-01-01",
+    "run_id": "RUN-MCA-T09-001",
+    "task_id": "TASK-MCA-T09-001",
+    "previous_findings": [],
+    "audience": "CCO"
+  },
+  "practice_records": [
+    {
+      "practice_id": "MKT-PARTNER-001",
+      "business_entity": "Northstar Commerce EU Ltd (synthetic)",
+      "operating_jurisdictions": ["EU"],
+      "audience_locations": ["EU"],
+      "channel": "email",
+      "purpose": "Partner co-marketing campaign records and attribution reporting",
+      "data_collected": ["work_email", "campaign_attribution_id", "partner_account_id"],
+      "collection_source": "Joint partner campaign landing page",
+      "lawful_basis": "consent",
+      "consent_method": "Unchecked affirmative opt-in checkbox on the joint landing page",
+      "consent_evidence": "SYNTHETIC-PARTNER-CONSENT-EXPORT-2026-07: consent timestamp and form version retained per contact",
+      "processors": ["SyntheticMail Platform", "SyntheticCMS"],
+      "retention": "Campaign records currently configured to retain for 24 months after campaign end, per the partner contract",
+      "opt_out_process": "One-click unsubscribe in every message; suppression list checked before every send",
+      "owner": "Partner Marketing",
+      "last_verified_at": "2026-07-10T14:00:00Z",
+      "control_evidence": {
+        "retention_configured_months": 24,
+        "retention_configuration_record": "SYNTHETIC-RETENTION-CONFIG-2026-07",
+        "approved_retention_exception": null,
+        "approved_interpretation": null
+      }
+    }
+  ],
+  "requested_outputs": ["upward_assessment", "cco_escalation"]
+}

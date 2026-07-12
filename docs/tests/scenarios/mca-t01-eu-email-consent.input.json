@@ -1,0 +1,74 @@
+{
+  "scenario_id": "MCA-T01",
+  "title": "EU newsletter promotional email assessed against a consent requirement pack",
+  "requirement_packs": [
+    {
+      "pack_version": "1.0.0",
+      "regulation_id": "PACK-CONSENT-EU",
+      "regulation_name": "Synthetic EU Promotional Email Consent Framework",
+      "jurisdiction_definitions": {
+        "EU": "Synthetic test jurisdiction; no legal interpretation is implied."
+      },
+      "requirements": [
+        {
+          "requirement_id": "EU-CONSENT-001",
+          "regulation_id": "PACK-CONSENT-EU",
+          "regulation_name": "Synthetic EU Promotional Email Consent Framework",
+          "jurisdiction": ["EU"],
+          "effective_from": "2025-01-01",
+          "title": "Retain affirmative promotional-email consent and withdrawal evidence",
+          "description": "Before promotional email is sent, retain evidence of an affirmative, purpose-specific opt-in and operate an opt-out process that is checked before dispatch.",
+          "source_citation": "SYNTHETIC-EU-CONSENT-1",
+          "topic": "promotional_email_consent",
+          "obligation_type": "required_control",
+          "applicability_conditions": {
+            "entity_types": ["private_entity"],
+            "data_subject_locations": ["EU"],
+            "channels": ["email"]
+          },
+          "likely_departments": ["Marketing"],
+          "priority": "high"
+        }
+      ]
+    }
+  ],
+  "runtime_context": {
+    "organisation": "Northstar Commerce Group (synthetic)",
+    "legal_entity": "Northstar Commerce EU Ltd (synthetic)",
+    "entity_type": "private_entity",
+    "business_unit": "Lifecycle Marketing",
+    "workflow_id": "WF-NEWSLETTER-EU-001",
+    "campaign_id": "CMP-NEWSLETTER-JULY-2026",
+    "audience_location": "EU",
+    "product": "Synthetic Commerce Platform",
+    "sector": "software",
+    "channel": "email",
+    "assessment_date": "2026-07-12",
+    "requirement_effective_date": "2025-01-01",
+    "run_id": "RUN-MCA-T01-001",
+    "task_id": "TASK-MCA-T01-001",
+    "previous_findings": [],
+    "audience": "Coordinator"
+  },
+  "practice_records": [
+    {
+      "practice_id": "MKT-EMAIL-EU-001",
+      "business_entity": "Northstar Commerce EU Ltd (synthetic)",
+      "operating_jurisdictions": ["EU"],
+      "audience_locations": ["EU"],
+      "channel": "email",
+      "purpose": "Promotional email for newsletter subscribers",
+      "data_collected": ["work_email", "consent_timestamp", "form_version"],
+      "collection_source": "Website newsletter form",
+      "lawful_basis": "consent",
+      "consent_method": "Unchecked affirmative opt-in checkbox specific to promotional email",
+      "consent_evidence": "SYNTHETIC-CMP-EXPORT-2026-07: consent timestamp and form version retained per contact",
+      "processors": ["SyntheticMail Platform"],
+      "retention": "24 months after last engagement, subject to approved retention process",
+      "opt_out_process": "One-click unsubscribe in every message; suppression list checked before every send",
+      "owner": "Lifecycle Marketing",
+      "last_verified_at": "2026-07-10T10:00:00Z"
+    }
+  ],
+  "requested_outputs": ["upward_assessment", "marketing_instruction"]
+}

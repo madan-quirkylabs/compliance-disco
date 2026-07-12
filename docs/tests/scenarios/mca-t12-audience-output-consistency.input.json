@@ -1,0 +1,76 @@
+{
+  "scenario_id": "MCA-T12",
+  "title": "One high-risk applicable finding rendered for three different audiences",
+  "run_instructions": "Run this bundle three times. On each run, replace `runtime_context.audience` with the next value from `audience_variants` and suffix `runtime_context.run_id` with `-<AUDIENCE>` (e.g. RUN-MCA-T12-001-CCO). Change nothing else. The three runs must produce the same underlying finding.",
+  "audience_variants": ["Coordinator", "CCO", "MarketingLead"],
+  "requirement_packs": [
+    {
+      "pack_version": "2.1.0",
+      "regulation_id": "PACK-COMM-EMAIL-US",
+      "regulation_name": "Synthetic US Commercial Email Framework",
+      "jurisdiction_definitions": {
+        "US": "Synthetic test jurisdiction; no legal interpretation is implied."
+      },
+      "requirements": [
+        {
+          "requirement_id": "US-EMAIL-OPTOUT-001",
+          "regulation_id": "PACK-COMM-EMAIL-US",
+          "regulation_name": "Synthetic US Commercial Email Framework",
+          "jurisdiction": ["US"],
+          "effective_from": "2025-01-01",
+          "title": "Provide and honor commercial-email opt-out",
+          "description": "Commercial promotional email must contain an operational unsubscribe mechanism, and the documented sending workflow must check and honor suppression before dispatch.",
+          "source_citation": "SYNTHETIC-US-EMAIL-4",
+          "topic": "commercial_email_opt_out",
+          "obligation_type": "required_control",
+          "applicability_conditions": {
+            "entity_types": ["private_entity"],
+            "data_subject_locations": ["US"],
+            "channels": ["email"]
+          },
+          "likely_departments": ["Marketing"],
+          "priority": "high"
+        }
+      ]
+    }
+  ],
+  "runtime_context": {
+    "organisation": "Northstar Commerce Group (synthetic)",
+    "legal_entity": "Northstar Commerce US Inc (synthetic)",
+    "entity_type": "private_entity",
+    "business_unit": "Demand Generation",
+    "workflow_id": "WF-CONFERENCE-FOLLOWUP-US-002",
+    "campaign_id": "CMP-CONFERENCE-FOLLOWUP-2026",
+    "audience_location": "US",
+    "product": "Synthetic Commerce Platform",
+    "sector": "software",
+    "channel": "email",
+    "assessment_date": "2026-07-12",
+    "requirement_effective_date": "2025-01-01",
+    "run_id": "RUN-MCA-T12-001",
+    "task_id": "TASK-MCA-T12-001",
+    "previous_findings": [],
+    "audience": "Coordinator"
+  },
+  "practice_records": [
+    {
+      "practice_id": "MKT-EMAIL-US-002",
+      "business_entity": "Northstar Commerce US Inc (synthetic)",
+      "operating_jurisdictions": ["US"],
+      "audience_locations": ["US"],
+      "channel": "email",
+      "purpose": "Promotional follow-up to conference contacts",
+      "data_collected": ["work_email", "conference_name"],
+      "collection_source": "Partner conference registration export",
+      "lawful_basis": "commercial marketing workflow basis not documented in this fixture",
+      "consent_method": "Partner registration record supplied without unsubscribe configuration",
+      "consent_evidence": "SYNTHETIC-PARTNER-EXPORT-2026-06: import record only",
+      "processors": ["SyntheticMail Platform"],
+      "retention": "Indefinite until manual list cleanup",
+      "opt_out_process": "No unsubscribe mechanism configured; sending workflow does not query a suppression list",
+      "owner": "Demand Generation",
+      "last_verified_at": "2026-07-11T15:00:00Z"
+    }
+  ],
+  "requested_outputs": ["upward_assessment", "cco_escalation", "marketing_instruction"]
+}

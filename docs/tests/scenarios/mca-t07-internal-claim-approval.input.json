@@ -1,0 +1,80 @@
+{
+  "scenario_id": "MCA-T07",
+  "title": "Scheduled landing page with a quantified claim, assessed against an internal claim-approval policy pack",
+  "requirement_packs": [
+    {
+      "pack_version": "3.0.0",
+      "regulation_id": "PACK-INTERNAL-CLAIMS",
+      "regulation_name": "Synthetic Marketing Claim Approval Policy",
+      "jurisdiction_definitions": {
+        "EU": "Synthetic test jurisdiction; no legal interpretation is implied."
+      },
+      "requirements": [
+        {
+          "requirement_id": "POLICY-CLAIM-APPROVAL-001",
+          "regulation_id": "PACK-INTERNAL-CLAIMS",
+          "regulation_name": "Synthetic Marketing Claim Approval Policy",
+          "jurisdiction": ["EU"],
+          "effective_from": "2025-01-01",
+          "title": "Obtain documented approval before publishing a quantified marketing claim",
+          "description": "Before a quantified marketing claim is published, retain supporting substantiation and a documented Compliance approval record. The agent must not approve a claim, validate its truth, or activate the campaign.",
+          "source_citation": "INTERNAL-POLICY-CLAIMS-7.2",
+          "topic": "marketing_claim_approval",
+          "obligation_type": "required_control",
+          "applicability_conditions": {
+            "entity_types": ["private_entity"],
+            "data_subject_locations": ["EU"],
+            "channels": ["web"]
+          },
+          "likely_departments": ["Marketing"],
+          "priority": "high"
+        }
+      ]
+    }
+  ],
+  "runtime_context": {
+    "organisation": "Northstar Commerce Group (synthetic)",
+    "legal_entity": "Northstar Commerce EU Ltd (synthetic)",
+    "entity_type": "private_entity",
+    "business_unit": "Product Marketing",
+    "workflow_id": "WF-BENCHMARK-LANDING-PAGE-001",
+    "campaign_id": "CMP-BENCHMARK-2026",
+    "audience_location": "EU",
+    "product": "Synthetic Commerce Platform",
+    "sector": "software",
+    "channel": "web",
+    "assessment_date": "2026-07-12",
+    "requirement_effective_date": "2025-01-01",
+    "run_id": "RUN-MCA-T07-001",
+    "task_id": "TASK-MCA-T07-001",
+    "previous_findings": [],
+    "audience": "MarketingLead"
+  },
+  "practice_records": [
+    {
+      "practice_id": "MKT-CLAIM-001",
+      "business_entity": "Northstar Commerce EU Ltd (synthetic)",
+      "operating_jurisdictions": ["EU"],
+      "audience_locations": ["EU"],
+      "channel": "web",
+      "purpose": "Scheduled landing-page campaign with quantified performance claim",
+      "data_collected": ["campaign_metadata"],
+      "collection_source": "Campaign brief",
+      "lawful_basis": "not applicable to the claim-approval control",
+      "consent_method": "not applicable to the claim-approval control",
+      "consent_evidence": "SYNTHETIC-SUBSTANTIATION-2026-07: approved product analytics report exists",
+      "processors": ["SyntheticCMS"],
+      "retention": "Campaign asset retained for 12 months",
+      "opt_out_process": "not applicable to the claim-approval control",
+      "owner": "Product Marketing",
+      "last_verified_at": "2026-07-11T16:00:00Z",
+      "control_evidence": {
+        "claim_text": "Synthetic benchmark campaign claims a 35% faster setup time.",
+        "substantiation_document": "SYNTHETIC-SUBSTANTIATION-2026-07",
+        "compliance_approval_record": null,
+        "publication_state": "scheduled; not live"
+      }
+    }
+  ],
+  "requested_outputs": ["upward_assessment", "cco_escalation", "marketing_instruction"]
+}

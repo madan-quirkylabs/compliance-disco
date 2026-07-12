@@ -1,0 +1,27 @@
+{
+  "scenario_id": "MCA-T05",
+  "test_id": "MCA-T05",
+  "input": "scenarios/mca-t05-missing-audience-location.input.json",
+  "primary_behavior": "Unknown applicability: the channel matches, but audience location is absent, so applicability cannot be decided.",
+  "expected_outcome": {
+    "applicability_status": "unknown",
+    "assessment_status": "unknown",
+    "maximum_confidence_exclusive": 0.8,
+    "decision_required": "CCO_review",
+    "affected_practices": ["MKT-WEB-TRACK-005"],
+    "missing_evidence": ["runtime_context.audience_location", "practice.audience_locations"],
+    "must_preserve": [
+      "PACK-REGION-C-TRACKING",
+      "2.0.0",
+      "REGION-C-TRACKING-001",
+      "SYNTHETIC-REGION-C-TRACKING-3"
+    ],
+    "must_not_do": [
+      "infer jurisdiction from company headquarters or legal entity",
+      "infer jurisdiction from IP, currency, or language assumptions",
+      "infer jurisdiction from the regulation's name",
+      "classify the practice as compliant, non_compliant, or not_applicable"
+    ]
+  },
+  "notes": "The escalation must ask precisely for audience-location evidence, not for generic 'more information'. not_applicable is as wrong as compliant here: absent evidence of applicability is not evidence of non-applicability."
+}

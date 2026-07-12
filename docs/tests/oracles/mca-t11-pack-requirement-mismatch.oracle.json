@@ -1,0 +1,26 @@
+{
+  "scenario_id": "MCA-T11",
+  "test_id": "MCA-T11",
+  "input": "scenarios/mca-t11-pack-requirement-mismatch.input.json",
+  "primary_behavior": "Input validation: the pack declares regulation_id REG-B, the requirement it contains declares REG-A. Validation must fail before any applicability or compliance analysis.",
+  "expected_outcome": {
+    "validation_status": "failed",
+    "applicability_status": null,
+    "assessment_status": null,
+    "decision_required": null,
+    "must_identify_mismatch": {
+      "pack_regulation_id": "REG-B",
+      "requirement_regulation_id": "REG-A",
+      "requirement_id": "REG-A-DISCLOSURE-001"
+    },
+    "must_request": "a corrected, versioned requirement pack in which the requirement's regulation_id matches its containing pack",
+    "must_not_do": [
+      "fabricate any status from the practice data",
+      "run applicability analysis",
+      "run compliance analysis",
+      "guess which regulation_id is the correct one",
+      "escalate to the CCO — this is a malformed input, not a compliance finding"
+    ]
+  },
+  "notes": "The practice record and runtime context are complete and would support a clean assessment — that is the trap. A well-formed-looking bundle with one corrupted linkage must halt at validation. Reporting a status of `unknown` is also a failure here: no classification of any kind should be produced."
+}

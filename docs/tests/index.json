@@ -1,0 +1,127 @@
+{
+  "manifest_version": "1.0.0",
+  "purpose": "Machine-readable index of the Marketing Compliance Agent test corpus. This is the file the Hermes agent reads to discover what it can assess.",
+  "assessment_date": "2026-07-12",
+  "company_snapshot": "company-current-compliance-status.json",
+  "specification": "marketing-compliance-agent.md",
+  "agent_readable": [
+    "index.json",
+    "company-current-compliance-status.json",
+    "scenarios/*.input.json"
+  ],
+  "agent_must_not_read": [
+    "oracles/*.oracle.json — these hold the expected outcomes. Reading one before or during an assessment invalidates the test. They exist for the human or harness that scores the run, not for the agent being scored."
+  ],
+  "data_classification": "synthetic. No personal data, no real organisation, no real regulation. Citations are synthetic identifiers and must be preserved verbatim, never resolved against real law.",
+  "scenarios": [
+    {
+      "test_id": "MCA-T01",
+      "input": "scenarios/mca-t01-eu-email-consent.input.json",
+      "situation": "EU newsletter promotional email, consent requirement pack, complete evidence.",
+      "packs": ["PACK-CONSENT-EU"],
+      "practices": ["MKT-EMAIL-EU-001"],
+      "audience": "Coordinator",
+      "requested_outputs": ["upward_assessment", "marketing_instruction"]
+    },
+    {
+      "test_id": "MCA-T02",
+      "input": "scenarios/mca-t02-us-commercial-email-opt-out.input.json",
+      "situation": "US conference follow-up email, commercial-email opt-out pack, no unsubscribe configured.",
+      "packs": ["PACK-COMM-EMAIL-US"],
+      "practices": ["MKT-EMAIL-US-002"],
+      "audience": "CCO",
+      "requested_outputs": ["upward_assessment", "cco_escalation", "marketing_instruction"]
+    },
+    {
+      "test_id": "MCA-T03",
+      "input": "scenarios/mca-t03-audience-outside-jurisdiction.input.json",
+      "situation": "Region-B SMS workflow, Region-A privacy pack.",
+      "packs": ["PACK-REGION-A-PRIVACY"],
+      "practices": ["MKT-SMS-B-001"],
+      "audience": "Coordinator",
+      "requested_outputs": ["upward_assessment"]
+    },
+    {
+      "test_id": "MCA-T04",
+      "input": "scenarios/mca-t04-future-effective-date.input.json",
+      "situation": "EU newsletter email, disclosure requirement that takes effect 2027-01-01.",
+      "packs": ["PACK-FUTURE-DISCLOSURE"],
+      "practices": ["MKT-EMAIL-EU-001"],
+      "audience": "Coordinator",
+      "requested_outputs": ["upward_assessment"]
+    },
+    {
+      "test_id": "MCA-T05",
+      "input": "scenarios/mca-t05-missing-audience-location.input.json",
+      "situation": "Web retargeting workflow, Region-C tracking pack, audience location not supplied by the upstream system.",
+      "packs": ["PACK-REGION-C-TRACKING"],
+      "practices": ["MKT-WEB-TRACK-005"],
+      "audience": "CCO",
+      "requested_outputs": ["upward_assessment", "cco_escalation"]
+    },
+    {
+      "test_id": "MCA-T06",
+      "input": "scenarios/mca-t06-missing-stale-evidence.input.json",
+      "situation": "EU promotional SMS, SMS consent pack, empty evidence fields and a two-year-old verification date.",
+      "packs": ["PACK-SMS-CONSENT-EU"],
+      "practices": ["MKT-SMS-EU-003"],
+      "audience": "CCO",
+      "requested_outputs": ["upward_assessment", "cco_escalation", "marketing_instruction"]
+    },
+    {
+      "test_id": "MCA-T07",
+      "input": "scenarios/mca-t07-internal-claim-approval.input.json",
+      "situation": "Scheduled landing page with a quantified claim, internal claim-approval policy pack, substantiation present but no approval record.",
+      "packs": ["PACK-INTERNAL-CLAIMS"],
+      "practices": ["MKT-CLAIM-001"],
+      "audience": "MarketingLead",
+      "requested_outputs": ["upward_assessment", "cco_escalation", "marketing_instruction"]
+    },
+    {
+      "test_id": "MCA-T08",
+      "input": "scenarios/mca-t08-accessibility-partial.input.json",
+      "situation": "Campaign landing page, web accessibility pack with an exhaustive supplied check list, one check fails.",
+      "packs": ["PACK-WEB-ACCESSIBILITY"],
+      "practices": ["MKT-WEB-ACCESS-001"],
+      "audience": "MarketingLead",
+      "requested_outputs": ["upward_assessment", "marketing_instruction"]
+    },
+    {
+      "test_id": "MCA-T09",
+      "input": "scenarios/mca-t09-conflicting-retention.input.json",
+      "situation": "Partner campaign records. Two applicable packs: retain 24 months, and delete after 12 months. No approved exception on file.",
+      "packs": ["PACK-CONTRACT-PARTNER", "PACK-INTERNAL-RETENTION"],
+      "practices": ["MKT-PARTNER-001"],
+      "audience": "CCO",
+      "requested_outputs": ["upward_assessment", "cco_escalation"]
+    },
+    {
+      "test_id": "MCA-T10",
+      "input": "scenarios/mca-t10-compatible-optout-windows.input.json",
+      "situation": "Opt-out processing measured at 8 days. Two applicable packs set 10-day and 5-day windows.",
+      "packs": ["PACK-OPTOUT-10DAY", "PACK-OPTOUT-5DAY"],
+      "practices": ["MKT-EMAIL-MULTI-001"],
+      "audience": "Coordinator",
+      "requested_outputs": ["upward_assessment", "cco_escalation", "marketing_instruction"]
+    },
+    {
+      "test_id": "MCA-T11",
+      "input": "scenarios/mca-t11-pack-requirement-mismatch.input.json",
+      "situation": "Pack declares regulation_id REG-B; the requirement inside it declares REG-A. Everything else is complete.",
+      "packs": ["REG-B"],
+      "practices": ["MKT-EMAIL-EU-001"],
+      "audience": "Coordinator",
+      "requested_outputs": ["upward_assessment"]
+    },
+    {
+      "test_id": "MCA-T12",
+      "input": "scenarios/mca-t12-audience-output-consistency.input.json",
+      "situation": "One high-risk applicable finding, run three times — once each for Coordinator, CCO, and MarketingLead. See run_instructions in the bundle.",
+      "packs": ["PACK-COMM-EMAIL-US"],
+      "practices": ["MKT-EMAIL-US-002"],
+      "audience": "Coordinator | CCO | MarketingLead",
+      "requested_outputs": ["upward_assessment", "cco_escalation", "marketing_instruction"],
+      "multi_run": true
+    }
+  ]
+}

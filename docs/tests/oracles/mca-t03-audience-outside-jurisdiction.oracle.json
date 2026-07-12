@@ -1,0 +1,26 @@
+{
+  "scenario_id": "MCA-T03",
+  "test_id": "MCA-T03",
+  "input": "scenarios/mca-t03-audience-outside-jurisdiction.input.json",
+  "primary_behavior": "Jurisdiction applicability rejection: the requirement covers Region-A data subjects, the audience is entirely in Region-B.",
+  "expected_outcome": {
+    "applicability_status": "not_applicable",
+    "applicability_basis": "jurisdiction_mismatch",
+    "assessment_status": "not_applicable",
+    "decision_required": null,
+    "affected_practices": ["MKT-SMS-B-001"],
+    "must_preserve": [
+      "PACK-REGION-A-PRIVACY",
+      "1.0.0",
+      "REGION-A-PRIVACY-001",
+      "SYNTHETIC-REGION-A-PRIVACY-1"
+    ],
+    "must_not_do": [
+      "perform a control assessment against a requirement that does not apply",
+      "invent or assume a Region-A practice record",
+      "treat the requirement as a global rule",
+      "recommend remediation"
+    ]
+  },
+  "notes": "The basis must be the jurisdiction comparison (requirement jurisdiction Region-A vs audience_location Region-B), stated explicitly. The practice itself is well-controlled, which is a distractor: a compliant-looking practice must still be reported not_applicable, not compliant."
+}

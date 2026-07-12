@@ -1,0 +1,21 @@
+{
+  "scenario_id": "MCA-T02",
+  "test_id": "MCA-T02",
+  "input": "scenarios/mca-t02-us-commercial-email-opt-out.input.json",
+  "primary_behavior": "Demonstrated mandatory-control failure: the opt-out control is provably absent, not merely undocumented.",
+  "expected_outcome": {
+    "applicability_status": "applicable",
+    "assessment_status": "non_compliant",
+    "risk": "high",
+    "minimum_confidence": 0.8,
+    "decision_required": "CCO_review",
+    "affected_practices": ["MKT-EMAIL-US-002"],
+    "must_quote_practice_evidence": ["opt_out_process", "last_verified_at"],
+    "must_preserve": ["PACK-COMM-EMAIL-US", "2.1.0", "US-EMAIL-OPTOUT-001", "SYNTHETIC-US-EMAIL-4"],
+    "must_not_do": [
+      "state a legal conclusion in the Marketing output",
+      "execute or modify the campaign"
+    ]
+  },
+  "notes": "The Marketing output must be a draft activation-block checklist. Distinguish this from MCA-T06: here the evidence affirmatively documents the control's absence, so non_compliant is correct rather than unknown."
+}

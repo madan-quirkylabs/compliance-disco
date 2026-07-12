@@ -1,0 +1,74 @@
+{
+  "scenario_id": "MCA-T05",
+  "title": "Web tracking workflow assessed against a Region-C tracking pack; audience location not supplied",
+  "requirement_packs": [
+    {
+      "pack_version": "2.0.0",
+      "regulation_id": "PACK-REGION-C-TRACKING",
+      "regulation_name": "Synthetic Region-C Online Tracking Framework",
+      "jurisdiction_definitions": {
+        "Region-C": "Synthetic test jurisdiction. Applies only to data subjects located in Region-C. No legal interpretation is implied."
+      },
+      "requirements": [
+        {
+          "requirement_id": "REGION-C-TRACKING-001",
+          "regulation_id": "PACK-REGION-C-TRACKING",
+          "regulation_name": "Synthetic Region-C Online Tracking Framework",
+          "jurisdiction": ["Region-C"],
+          "effective_from": "2025-01-01",
+          "title": "Obtain prior consent before non-essential web tracking of Region-C data subjects",
+          "description": "Non-essential tracking or advertising identifiers placed on the devices of Region-C data subjects require prior affirmative consent and a retained record of that consent.",
+          "source_citation": "SYNTHETIC-REGION-C-TRACKING-3",
+          "topic": "web_tracking_consent",
+          "obligation_type": "required_control",
+          "applicability_conditions": {
+            "entity_types": ["private_entity"],
+            "data_subject_locations": ["Region-C"],
+            "channels": ["web"]
+          },
+          "likely_departments": ["Marketing"],
+          "priority": "high"
+        }
+      ]
+    }
+  ],
+  "runtime_context": {
+    "organisation": "Northstar Commerce Group (synthetic)",
+    "legal_entity": "Northstar Commerce Group (synthetic)",
+    "entity_type": "private_entity",
+    "business_unit": "Performance Marketing",
+    "workflow_id": "WF-WEB-RETARGETING-005",
+    "campaign_id": "CMP-RETARGETING-2026",
+    "product": "Synthetic Commerce Platform",
+    "sector": "software",
+    "channel": "web",
+    "assessment_date": "2026-07-12",
+    "requirement_effective_date": "2025-01-01",
+    "run_id": "RUN-MCA-T05-001",
+    "task_id": "TASK-MCA-T05-001",
+    "previous_findings": [],
+    "audience": "CCO",
+    "context_notes": "The upstream campaign system did not supply an audience location for this workflow. No audience-location evidence accompanies this bundle."
+  },
+  "practice_records": [
+    {
+      "practice_id": "MKT-WEB-TRACK-005",
+      "business_entity": "Northstar Commerce Group (synthetic)",
+      "operating_jurisdictions": ["Not documented in supplied evidence"],
+      "audience_locations": [],
+      "channel": "web",
+      "purpose": "Retargeting pixel on campaign landing pages",
+      "data_collected": ["advertising_identifier", "page_view_events"],
+      "collection_source": "Campaign landing page tag manager",
+      "lawful_basis": "Not documented in supplied evidence",
+      "consent_method": "Consent banner present; configuration export not supplied",
+      "consent_evidence": "Not documented in supplied evidence",
+      "processors": ["SyntheticAds Network"],
+      "retention": "Not documented in supplied evidence",
+      "opt_out_process": "Banner offers a reject option; enforcement evidence not supplied",
+      "owner": "Performance Marketing",
+      "last_verified_at": "2026-06-30T12:00:00Z"
+    }
+  ],
+  "requested_outputs": ["upward_assessment", "cco_escalation"]
+}

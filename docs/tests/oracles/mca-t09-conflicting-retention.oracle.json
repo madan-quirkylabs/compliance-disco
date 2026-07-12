@@ -1,0 +1,46 @@
+{
+  "scenario_id": "MCA-T09",
+  "test_id": "MCA-T09",
+  "input": "scenarios/mca-t09-conflicting-retention.input.json",
+  "primary_behavior": "Conflict preservation: two applicable requirements cannot both be satisfied as written, and no approved exception or interpretation is supplied.",
+  "expected_records": [
+    {
+      "requirement_id": "PARTNER-RETENTION-001",
+      "regulation_id": "PACK-CONTRACT-PARTNER",
+      "pack_version": "1.0.0",
+      "source_citation": "SYNTHETIC-PARTNER-CONTRACT-5",
+      "applicability_status": "applicable"
+    },
+    {
+      "requirement_id": "POLICY-RETENTION-001",
+      "regulation_id": "PACK-INTERNAL-RETENTION",
+      "pack_version": "4.0.0",
+      "source_citation": "INTERNAL-POLICY-RETENTION-3.1",
+      "applicability_status": "applicable"
+    }
+  ],
+  "expected_outcome": {
+    "record_count": 2,
+    "shared_affected_practices": ["MKT-PARTNER-001"],
+    "conflicts": ["PARTNER-RETENTION-001", "POLICY-RETENTION-001"],
+    "maximum_confidence_exclusive": 0.8,
+    "decision_required": "CCO_review",
+    "must_preserve": [
+      "PACK-CONTRACT-PARTNER",
+      "1.0.0",
+      "PARTNER-RETENTION-001",
+      "SYNTHETIC-PARTNER-CONTRACT-5",
+      "PACK-INTERNAL-RETENTION",
+      "4.0.0",
+      "POLICY-RETENTION-001",
+      "INTERNAL-POLICY-RETENTION-3.1"
+    ],
+    "must_not_do": [
+      "emit a strictest_recommendation — the obligations are not jointly satisfiable",
+      "merge the two requirements into one opaque status",
+      "silently prefer the contract over the policy, or the policy over the contract",
+      "invent an approved exception or interpretation"
+    ]
+  },
+  "notes": "24-month retention and 12-month deletion are mutually exclusive for the same record category, and control_evidence shows approved_retention_exception and approved_interpretation are both null. The escalation must name the exact decision required: an approved interpretation, or an approved retention exception for WF-PARTNER-COMARKETING-007. Contrast with MCA-T10, where the two requirements ARE jointly satisfiable and a strictest_recommendation is expected."
+}

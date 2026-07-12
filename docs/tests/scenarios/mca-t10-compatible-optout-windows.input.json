@@ -1,0 +1,110 @@
+{
+  "scenario_id": "MCA-T10",
+  "title": "Email opt-out processing assessed against a 10-day window pack and a 5-day window pack",
+  "requirement_packs": [
+    {
+      "pack_version": "1.0.0",
+      "regulation_id": "PACK-OPTOUT-10DAY",
+      "regulation_name": "Synthetic Opt-Out Processing Framework (10-day)",
+      "jurisdiction_definitions": {
+        "EU": "Synthetic test jurisdiction; no legal interpretation is implied."
+      },
+      "requirements": [
+        {
+          "requirement_id": "OPTOUT-WINDOW-10D-001",
+          "regulation_id": "PACK-OPTOUT-10DAY",
+          "regulation_name": "Synthetic Opt-Out Processing Framework (10-day)",
+          "jurisdiction": ["EU"],
+          "effective_from": "2025-01-01",
+          "title": "Process promotional-email opt-out requests within 10 days",
+          "description": "An opt-out request for promotional email must be applied to the suppression list, and honored on all subsequent sends, no later than 10 calendar days after receipt. Operational evidence of the processing time must be retained.",
+          "source_citation": "SYNTHETIC-OPTOUT-10",
+          "topic": "opt_out_processing_window",
+          "obligation_type": "required_control",
+          "supplied_window_days": 10,
+          "applicability_conditions": {
+            "entity_types": ["private_entity"],
+            "data_subject_locations": ["EU"],
+            "channels": ["email"]
+          },
+          "likely_departments": ["Marketing"],
+          "priority": "medium"
+        }
+      ]
+    },
+    {
+      "pack_version": "2.0.0",
+      "regulation_id": "PACK-OPTOUT-5DAY",
+      "regulation_name": "Synthetic Opt-Out Processing Framework (5-day)",
+      "jurisdiction_definitions": {
+        "EU": "Synthetic test jurisdiction; no legal interpretation is implied."
+      },
+      "requirements": [
+        {
+          "requirement_id": "OPTOUT-WINDOW-5D-001",
+          "regulation_id": "PACK-OPTOUT-5DAY",
+          "regulation_name": "Synthetic Opt-Out Processing Framework (5-day)",
+          "jurisdiction": ["EU"],
+          "effective_from": "2025-01-01",
+          "title": "Process promotional-email opt-out requests within 5 days",
+          "description": "An opt-out request for promotional email must be applied to the suppression list, and honored on all subsequent sends, no later than 5 calendar days after receipt. Operational evidence of the processing time must be retained.",
+          "source_citation": "SYNTHETIC-OPTOUT-5",
+          "topic": "opt_out_processing_window",
+          "obligation_type": "required_control",
+          "supplied_window_days": 5,
+          "applicability_conditions": {
+            "entity_types": ["private_entity"],
+            "data_subject_locations": ["EU"],
+            "channels": ["email"]
+          },
+          "likely_departments": ["Marketing"],
+          "priority": "high"
+        }
+      ]
+    }
+  ],
+  "runtime_context": {
+    "organisation": "Northstar Commerce Group (synthetic)",
+    "legal_entity": "Northstar Commerce EU Ltd (synthetic)",
+    "entity_type": "private_entity",
+    "business_unit": "Lifecycle Marketing",
+    "workflow_id": "WF-OPTOUT-PROCESSING-008",
+    "campaign_id": "CMP-LIFECYCLE-2026",
+    "audience_location": "EU",
+    "product": "Synthetic Commerce Platform",
+    "sector": "software",
+    "channel": "email",
+    "assessment_date": "2026-07-12",
+    "requirement_effective_date": "2025-01-01",
+    "run_id": "RUN-MCA-T10-001",
+    "task_id": "TASK-MCA-T10-001",
+    "previous_findings": [],
+    "audience": "Coordinator"
+  },
+  "practice_records": [
+    {
+      "practice_id": "MKT-EMAIL-MULTI-001",
+      "business_entity": "Northstar Commerce EU Ltd (synthetic)",
+      "operating_jurisdictions": ["EU"],
+      "audience_locations": ["EU"],
+      "channel": "email",
+      "purpose": "Lifecycle promotional email with centralized opt-out processing",
+      "data_collected": ["work_email", "consent_timestamp", "opt_out_timestamp"],
+      "collection_source": "Website newsletter form",
+      "lawful_basis": "consent",
+      "consent_method": "Unchecked affirmative opt-in checkbox specific to promotional email",
+      "consent_evidence": "SYNTHETIC-CMP-EXPORT-2026-07: consent timestamp and form version retained per contact",
+      "processors": ["SyntheticMail Platform"],
+      "retention": "24 months after last engagement",
+      "opt_out_process": "Unsubscribe requests are queued and applied to the suppression list by a batch job that runs every 8 days; suppression list is checked before every send",
+      "owner": "Lifecycle Marketing",
+      "last_verified_at": "2026-07-10T10:00:00Z",
+      "control_evidence": {
+        "opt_out_processing_days": 8,
+        "operational_evidence": "SYNTHETIC-SUPPRESSION-JOB-LOG-2026-07: batch job run history showing a median 8-day and maximum 8-day application time across the last 90 days",
+        "measurement_basis": "time from unsubscribe request receipt to suppression-list application"
+      }
+    }
+  ],
+  "requested_outputs": ["upward_assessment", "cco_escalation", "marketing_instruction"]
+}

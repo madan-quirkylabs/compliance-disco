@@ -1,0 +1,52 @@
+{
+  "scenario_id": "MCA-T10",
+  "test_id": "MCA-T10",
+  "input": "scenarios/mca-t10-compatible-optout-windows.input.json",
+  "primary_behavior": "Strictest compatible control: two applicable requirements set different limits on the same control, and satisfying the stricter one satisfies both.",
+  "expected_records": [
+    {
+      "requirement_id": "OPTOUT-WINDOW-10D-001",
+      "regulation_id": "PACK-OPTOUT-10DAY",
+      "pack_version": "1.0.0",
+      "source_citation": "SYNTHETIC-OPTOUT-10",
+      "applicability_status": "applicable",
+      "assessment_status": "compliant",
+      "basis": "8-day processing is within the supplied 10-day window"
+    },
+    {
+      "requirement_id": "OPTOUT-WINDOW-5D-001",
+      "regulation_id": "PACK-OPTOUT-5DAY",
+      "pack_version": "2.0.0",
+      "source_citation": "SYNTHETIC-OPTOUT-5",
+      "applicability_status": "applicable",
+      "assessment_status": "non_compliant",
+      "basis": "8-day processing exceeds the supplied 5-day window"
+    }
+  ],
+  "expected_outcome": {
+    "record_count": 2,
+    "shared_affected_practices": ["MKT-EMAIL-MULTI-001"],
+    "strictest_recommendation": "Adopt the supplied 5-day opt-out processing window, which satisfies both requirements",
+    "must_quote_practice_evidence": [
+      "opt_out_process",
+      "control_evidence.opt_out_processing_days",
+      "control_evidence.operational_evidence"
+    ],
+    "must_preserve": [
+      "PACK-OPTOUT-10DAY",
+      "1.0.0",
+      "OPTOUT-WINDOW-10D-001",
+      "SYNTHETIC-OPTOUT-10",
+      "PACK-OPTOUT-5DAY",
+      "2.0.0",
+      "OPTOUT-WINDOW-5D-001",
+      "SYNTHETIC-OPTOUT-5"
+    ],
+    "must_not_do": [
+      "merge the two statuses into a single overall label",
+      "report `conflicts` — the requirements are jointly satisfiable",
+      "propose a window other than the supplied 5 days"
+    ]
+  },
+  "notes": "Contrast with MCA-T09: there the obligations are mutually exclusive (conflict, no strictest control); here they are nested (the 5-day control satisfies the 10-day requirement too). The per-requirement statuses genuinely differ — compliant and non_compliant against the same practice — and collapsing them into one label is the failure this scenario hunts for. Risk and confidence are not pinned by the spec for this case; assert only that they are present and internally consistent."
+}

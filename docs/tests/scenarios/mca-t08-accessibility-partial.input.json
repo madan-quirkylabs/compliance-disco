@@ -1,0 +1,84 @@
+{
+  "scenario_id": "MCA-T08",
+  "title": "Campaign landing page assessed against a web accessibility pack with a supplied check list",
+  "requirement_packs": [
+    {
+      "pack_version": "1.2.0",
+      "regulation_id": "PACK-WEB-ACCESSIBILITY",
+      "regulation_name": "Synthetic Web Accessibility Standard",
+      "jurisdiction_definitions": {
+        "EU": "Synthetic test jurisdiction; no legal interpretation is implied."
+      },
+      "requirements": [
+        {
+          "requirement_id": "ACCESSIBILITY-LANDING-001",
+          "regulation_id": "PACK-WEB-ACCESSIBILITY",
+          "regulation_name": "Synthetic Web Accessibility Standard",
+          "jurisdiction": ["EU"],
+          "effective_from": "2025-01-01",
+          "title": "Pass the supplied landing-page accessibility checks and retain verification evidence",
+          "description": "A campaign landing page must pass every check in `supplied_checks` and retain dated verification evidence recording each check result. The supplied check list is exhaustive for this requirement: no additional accessibility criteria may be read into it.",
+          "source_citation": "SYNTHETIC-ACCESSIBILITY-SECTION-2",
+          "topic": "landing_page_accessibility",
+          "obligation_type": "required_control",
+          "supplied_checks": ["keyboard_navigation", "colour_contrast", "image_alt_text"],
+          "applicability_conditions": {
+            "entity_types": ["private_entity"],
+            "data_subject_locations": ["EU"],
+            "channels": ["web"]
+          },
+          "likely_departments": ["Marketing"],
+          "priority": "medium"
+        }
+      ]
+    }
+  ],
+  "runtime_context": {
+    "organisation": "Northstar Commerce Group (synthetic)",
+    "legal_entity": "Northstar Commerce EU Ltd (synthetic)",
+    "entity_type": "private_entity",
+    "business_unit": "Web Marketing",
+    "workflow_id": "WF-CAMPAIGN-LANDING-006",
+    "campaign_id": "CMP-SUMMER-LANDING-2026",
+    "audience_location": "EU",
+    "product": "Synthetic Commerce Platform",
+    "sector": "software",
+    "channel": "web",
+    "assessment_date": "2026-07-12",
+    "requirement_effective_date": "2025-01-01",
+    "run_id": "RUN-MCA-T08-001",
+    "task_id": "TASK-MCA-T08-001",
+    "previous_findings": [],
+    "audience": "MarketingLead"
+  },
+  "practice_records": [
+    {
+      "practice_id": "MKT-WEB-ACCESS-001",
+      "business_entity": "Northstar Commerce EU Ltd (synthetic)",
+      "operating_jurisdictions": ["EU"],
+      "audience_locations": ["EU"],
+      "channel": "web",
+      "purpose": "Seasonal campaign landing page",
+      "data_collected": ["form_submission_email"],
+      "collection_source": "Landing-page lead form",
+      "lawful_basis": "consent",
+      "consent_method": "Unchecked affirmative opt-in checkbox on the lead form",
+      "consent_evidence": "SYNTHETIC-CMS-EXPORT-2026-07: form consent state retained per submission",
+      "processors": ["SyntheticCMS"],
+      "retention": "12 months after campaign end",
+      "opt_out_process": "One-click unsubscribe on any follow-up email; suppression list checked before send",
+      "owner": "Web Marketing",
+      "last_verified_at": "2026-07-08T11:00:00Z",
+      "control_evidence": {
+        "audit_document": "SYNTHETIC-ACCESSIBILITY-AUDIT-2026-07",
+        "audit_date": "2026-07-08",
+        "check_results": {
+          "keyboard_navigation": "pass — all interactive elements reachable and operable by keyboard",
+          "colour_contrast": "pass — all text meets the supplied contrast ratio",
+          "image_alt_text": "fail — 6 of 9 campaign images have no alt text attribute"
+        }
+      }
+    }
+  ],
+  "requested_outputs": ["upward_assessment", "marketing_instruction"]
+}

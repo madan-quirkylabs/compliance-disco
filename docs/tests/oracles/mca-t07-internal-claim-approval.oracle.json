@@ -1,0 +1,31 @@
+{
+  "scenario_id": "MCA-T07",
+  "test_id": "MCA-T07",
+  "input": "scenarios/mca-t07-internal-claim-approval.input.json",
+  "primary_behavior": "Non-regulatory requirement pack: an approved internal policy is assessed with the same machinery as a regulation, and the pre-publication approval control is demonstrably absent.",
+  "expected_outcome": {
+    "applicability_status": "applicable",
+    "assessment_status": "non_compliant",
+    "risk": "high",
+    "minimum_confidence": 0.8,
+    "decision_required": "CCO_review",
+    "affected_practices": ["MKT-CLAIM-001"],
+    "must_quote_practice_evidence": [
+      "control_evidence.substantiation_document",
+      "control_evidence.compliance_approval_record",
+      "control_evidence.publication_state"
+    ],
+    "must_preserve": [
+      "PACK-INTERNAL-CLAIMS",
+      "3.0.0",
+      "POLICY-CLAIM-APPROVAL-001",
+      "INTERNAL-POLICY-CLAIMS-7.2"
+    ],
+    "must_not_do": [
+      "approve the claim",
+      "validate the truth of the 35% figure",
+      "activate or schedule the campaign"
+    ]
+  },
+  "notes": "Substantiation exists but approval does not — compliance_approval_record is null and the campaign is scheduled but not live. The recommended control is to obtain and retain human approval before activation. Risk is high because the control is a mandatory pre-publication gate, even though nothing has published yet. An agent that reasons 'substantiation exists, so the claim is fine' has failed."
+}

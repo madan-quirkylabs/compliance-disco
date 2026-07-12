@@ -1,0 +1,75 @@
+{
+  "scenario_id": "MCA-T03",
+  "title": "Region-B SMS workflow assessed against a Region-A privacy requirement pack",
+  "requirement_packs": [
+    {
+      "pack_version": "1.0.0",
+      "regulation_id": "PACK-REGION-A-PRIVACY",
+      "regulation_name": "Synthetic Region-A Privacy Framework",
+      "jurisdiction_definitions": {
+        "Region-A": "Synthetic test jurisdiction. Applies only to data subjects located in Region-A. No legal interpretation is implied.",
+        "Region-B": "Synthetic test jurisdiction, separate and non-overlapping with Region-A."
+      },
+      "requirements": [
+        {
+          "requirement_id": "REGION-A-PRIVACY-001",
+          "regulation_id": "PACK-REGION-A-PRIVACY",
+          "regulation_name": "Synthetic Region-A Privacy Framework",
+          "jurisdiction": ["Region-A"],
+          "effective_from": "2025-01-01",
+          "title": "Retain prior consent for promotional SMS to Region-A data subjects",
+          "description": "Promotional SMS directed at data subjects located in Region-A requires retained prior consent and a documented withdrawal process. This requirement is limited to Region-A data subjects and confers no obligation for other jurisdictions.",
+          "source_citation": "SYNTHETIC-REGION-A-PRIVACY-1",
+          "topic": "promotional_sms_consent",
+          "obligation_type": "required_control",
+          "applicability_conditions": {
+            "entity_types": ["private_entity"],
+            "data_subject_locations": ["Region-A"],
+            "channels": ["sms"]
+          },
+          "likely_departments": ["Marketing"],
+          "priority": "high"
+        }
+      ]
+    }
+  ],
+  "runtime_context": {
+    "organisation": "Northstar Commerce Group (synthetic)",
+    "legal_entity": "Northstar Commerce Region-B Pte Ltd (synthetic)",
+    "entity_type": "private_entity",
+    "business_unit": "Regional Growth",
+    "workflow_id": "WF-SMS-REGION-B-004",
+    "campaign_id": "CMP-SMS-REGION-B-2026",
+    "audience_location": "Region-B",
+    "product": "Synthetic Commerce Platform",
+    "sector": "software",
+    "channel": "sms",
+    "assessment_date": "2026-07-12",
+    "requirement_effective_date": "2025-01-01",
+    "run_id": "RUN-MCA-T03-001",
+    "task_id": "TASK-MCA-T03-001",
+    "previous_findings": [],
+    "audience": "Coordinator"
+  },
+  "practice_records": [
+    {
+      "practice_id": "MKT-SMS-B-001",
+      "business_entity": "Northstar Commerce Region-B Pte Ltd (synthetic)",
+      "operating_jurisdictions": ["Region-B"],
+      "audience_locations": ["Region-B"],
+      "channel": "sms",
+      "purpose": "Promotional SMS for Region-B retail subscribers",
+      "data_collected": ["phone", "store_preference"],
+      "collection_source": "In-store signup tablet",
+      "lawful_basis": "consent",
+      "consent_method": "Double opt-in confirmed by reply keyword",
+      "consent_evidence": "SYNTHETIC-REGION-B-SMS-EXPORT-2026-07: opt-in keyword and timestamp retained per contact",
+      "processors": ["SyntheticSMS Platform"],
+      "retention": "18 months after last engagement",
+      "opt_out_process": "STOP keyword honored; suppression list checked before every send",
+      "owner": "Regional Growth",
+      "last_verified_at": "2026-07-09T08:30:00Z"
+    }
+  ],
+  "requested_outputs": ["upward_assessment"]
+}

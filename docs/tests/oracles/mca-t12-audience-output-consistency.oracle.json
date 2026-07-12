@@ -1,0 +1,35 @@
+{
+  "scenario_id": "MCA-T12",
+  "test_id": "MCA-T12",
+  "input": "scenarios/mca-t12-audience-output-consistency.input.json",
+  "primary_behavior": "Output consistency: audience changes the presentation, never the finding.",
+  "expected_outcome": {
+    "runs": 3,
+    "audiences": ["Coordinator", "CCO", "MarketingLead"],
+    "invariant_across_all_three_runs": [
+      "requirement_id: US-EMAIL-OPTOUT-001",
+      "regulation_id: PACK-COMM-EMAIL-US",
+      "pack_version: 2.1.0",
+      "source_citation: SYNTHETIC-US-EMAIL-4",
+      "applicability_status: applicable",
+      "assessment_status: non_compliant",
+      "risk: high",
+      "affected_practices: [MKT-EMAIL-US-002]",
+      "decision_required: CCO_review",
+      "the quoted practice evidence",
+      "the numeric confidence"
+    ],
+    "per_audience_shape": {
+      "Coordinator": "The structured assessment record itself.",
+      "CCO": "Knowns, unknowns, business impact, conflict summary (none here), and the exact decision required.",
+      "MarketingLead": "workflow, required_change, owner, deadline placeholder, acceptance criteria, escalation contact, and optionally the citation."
+    },
+    "must_not_do": [
+      "soften, escalate, or re-score the finding for a friendlier audience",
+      "drop the citation or practice IDs from any audience's output",
+      "state a legal conclusion in the MarketingLead output",
+      "disclose personal data in any output"
+    ]
+  },
+  "notes": "This reuses the MCA-T02 finding deliberately: it is the high-risk applicable case. Evaluate by diffing the three outputs — every item in invariant_across_all_three_runs must be byte-identical in substance across the runs, and only the framing may differ. A confidence score that drifts between audiences is a failure."
+}
