@@ -142,6 +142,14 @@ export const items: ComplianceItem[] = [
         action: "Extracted requirement",
         summary: "Parsed Section 6(1) into a discrete requirement.",
         confidence: 0.94,
+        reasoning:
+          "Section 6(1) states a single obligation, so it maps to one requirement. Kept the Act's wording verbatim and wrote the plain summary as a separate field — never blended.",
+        input: { document: "DPDP Act 2023.pdf", section: "Section 6(1)" },
+        output: {
+          requirement_id: "DPDP-001",
+          citation: "DPDP Act 2023, Section 6(1)",
+          risk: "high",
+        },
         handoffTo: "Coordinator Agent",
       },
       {
@@ -153,6 +161,13 @@ export const items: ComplianceItem[] = [
         action: "Routed to Marketing",
         summary: "Determined this requirement is Marketing-only.",
         confidence: 0.97,
+        reasoning:
+          "Promotional dispatch is owned entirely by Marketing. No engineering-owned control gates it, so Engineering was excluded rather than copied in by default.",
+        input: {
+          requirement_id: "DPDP-001",
+          candidate_departments: ["engineering", "marketing"],
+        },
+        output: { routed_to: ["marketing"], excluded: ["engineering"] },
         handoffTo: "Marketing Agent",
       },
       {
@@ -164,6 +179,18 @@ export const items: ComplianceItem[] = [
         action: "Produced assessment",
         summary: "Found MKT-EMAIL-01 lacks consent evidence — non_compliant.",
         confidence: 0.91,
+        reasoning:
+          "MKT-EMAIL-01 has consent_evidence = null. Absence of a record is not consent, so this is non_compliant — not unknown, because the practice record itself is current and affirmatively shows no evidence.",
+        input: {
+          requirement_id: "DPDP-001",
+          practices: ["MKT-EMAIL-01", "MKT-CRM-01"],
+        },
+        output: {
+          assessment_status: "non_compliant",
+          cited_practices: ["MKT-EMAIL-01", "MKT-CRM-01"],
+          required_actions: 3,
+          evidence_required: 1,
+        },
         handoffTo: "Composer Agent",
       },
       {
@@ -175,6 +202,13 @@ export const items: ComplianceItem[] = [
         action: "Drafted FDO section",
         summary: "Composed the FDO paragraph for this item.",
         confidence: 0.89,
+        reasoning:
+          "Wrote the FDO paragraph from the Marketing assessment only. Every claim traces to a cited practice or the verbatim excerpt; nothing was inferred to fill gaps.",
+        input: { assessments: 1, departments: ["marketing"] },
+        output: {
+          fdo_section: "DPDP-001 — Consent required before promotional communication",
+          citations: ["DPDP Act 2023, Section 6(1)"],
+        },
       },
     ],
     fdoSection:
@@ -258,6 +292,15 @@ export const items: ComplianceItem[] = [
         action: "Extracted requirement",
         summary: "Parsed Section 8(7).",
         confidence: 0.92,
+        reasoning:
+          "Section 8(7) carries a statutory carve-out ('unless retention is necessary for compliance with any law'). Preserved the exception in the excerpt rather than extracting a flat delete-always rule.",
+        input: { document: "DPDP Act 2023.pdf", section: "Section 8(7)" },
+        output: {
+          requirement_id: "DPDP-002",
+          citation: "DPDP Act 2023, Section 8(7)",
+          risk: "high",
+        },
+        handoffTo: "Coordinator Agent",
       },
       {
         id: "b2",
@@ -268,6 +311,14 @@ export const items: ComplianceItem[] = [
         action: "Routed to Engineering + Marketing",
         summary: "Both departments hold personal data stores.",
         confidence: 0.95,
+        reasoning:
+          "Retention obligations bind every store holding personal data. Engineering owns the production and warehouse copies; Marketing owns the CRM and automation platform. Routed jointly, in parallel.",
+        input: {
+          requirement_id: "DPDP-002",
+          candidate_departments: ["engineering", "marketing"],
+        },
+        output: { routed_to: ["engineering", "marketing"], mode: "parallel" },
+        handoffTo: "Engineering Agent + Marketing Agent",
       },
       {
         id: "b3",
@@ -278,6 +329,18 @@ export const items: ComplianceItem[] = [
         action: "Produced assessment",
         summary: "Manual runbook exists; no automation. Marked partial.",
         confidence: 0.88,
+        reasoning:
+          "A documented deletion runbook exists, so this is not a total gap — but it is executed manually and on request only. Partial, not compliant: a control without automation cannot evidence timeliness.",
+        input: {
+          requirement_id: "DPDP-002",
+          sources: ["schema.sql", "runbooks/deletion.md"],
+        },
+        output: {
+          assessment_status: "partial",
+          gap: "no automated retention job",
+          required_actions: 2,
+        },
+        handoffTo: "Composer Agent",
       },
       {
         id: "b4",
@@ -288,6 +351,15 @@ export const items: ComplianceItem[] = [
         action: "Produced assessment",
         summary: "Indefinite CRM retention. Marked non_compliant.",
         confidence: 0.86,
+        reasoning:
+          "MKT-CRM-01 sets no retention period at all — contacts persist indefinitely after the purpose is served. That is an affirmative breach of 8(7), not missing evidence.",
+        input: { requirement_id: "DPDP-002", practices: ["MKT-CRM-01"] },
+        output: {
+          assessment_status: "non_compliant",
+          cited_practices: ["MKT-CRM-01"],
+          gap: "no retention period configured",
+        },
+        handoffTo: "Composer Agent",
       },
       {
         id: "b5",
@@ -363,6 +435,15 @@ export const items: ComplianceItem[] = [
         action: "Extracted requirement",
         summary: "Parsed Section 8(6).",
         confidence: 0.95,
+        reasoning:
+          "Breach notification is time-bound and prescriptive, so the excerpt was kept whole — truncating it would drop the notification duty owed to both the Board and each affected principal.",
+        input: { document: "DPDP Act 2023.pdf", section: "Section 8(6)" },
+        output: {
+          requirement_id: "DPDP-003",
+          citation: "DPDP Act 2023, Section 8(6)",
+          risk: "critical",
+        },
+        handoffTo: "Engineering Agent",
       },
       {
         id: "c2",
@@ -373,6 +454,19 @@ export const items: ComplianceItem[] = [
         action: "Escalated to human review",
         summary: "Runbook gap is above agent threshold — auto-escalated to CCO.",
         confidence: 0.93,
+        reasoning:
+          "The incident runbook covers internal triage but names no principal-facing notification path. On a critical-risk requirement the agent does not get to decide the company's exposure — escalated to the CCO instead of scoring it.",
+        input: {
+          requirement_id: "DPDP-003",
+          sources: ["runbooks/ir.md"],
+          risk: "critical",
+        },
+        output: {
+          assessment_status: "non_compliant",
+          escalated_to: "Chief Compliance Officer",
+          reason: "critical-risk gap exceeds agent decision threshold",
+        },
+        handoffTo: "Chief Compliance Officer",
       },
       {
         id: "c3",
@@ -429,6 +523,15 @@ export const items: ComplianceItem[] = [
         action: "Extracted requirement",
         summary: "Parsed Section 5.",
         confidence: 0.9,
+        reasoning:
+          "Section 5 ties collection to a stated purpose. Extracted it as a purpose-limitation duty rather than a data-minimisation rule, which is a related but distinct obligation.",
+        input: { document: "DPDP Act 2023.pdf", section: "Section 5" },
+        output: {
+          requirement_id: "DPDP-004",
+          citation: "DPDP Act 2023, Section 5",
+          risk: "medium",
+        },
+        handoffTo: "Coordinator Agent",
       },
     ],
     fdoSection:
@@ -480,6 +583,15 @@ export const items: ComplianceItem[] = [
         action: "Extracted requirement",
         summary: "Parsed Section 8(4).",
         confidence: 0.88,
+        reasoning:
+          "'Reasonable security safeguards' is deliberately open-ended in the Act. Confidence is 0.88 because the citation is unambiguous even though the standard it sets is not.",
+        input: { document: "DPDP Act 2023.pdf", section: "Section 8(4)" },
+        output: {
+          requirement_id: "DPDP-005",
+          citation: "DPDP Act 2023, Section 8(4)",
+          risk: "high",
+        },
+        handoffTo: "Coordinator Agent",
       },
     ],
     fdoSection:
@@ -530,6 +642,15 @@ export const items: ComplianceItem[] = [
         action: "Produced assessment",
         summary: "Banner meets the requirement — compliant.",
         confidence: 0.9,
+        reasoning:
+          "MKT-WEB-01 has both toggles defaulting to off and a current consent-platform export on file. Control present AND evidence present, so compliant is earned rather than assumed.",
+        input: { requirement_id: "DPDP-006", practices: ["MKT-WEB-01"] },
+        output: {
+          assessment_status: "compliant",
+          cited_practices: ["MKT-WEB-01"],
+          required_actions: 1,
+        },
+        handoffTo: "Composer Agent",
       },
       {
         id: "f2",
@@ -600,6 +721,15 @@ export const items: ComplianceItem[] = [
         action: "Extracted requirement",
         summary: "Parsed Section 6(4).",
         confidence: 0.91,
+        reasoning:
+          "The operative test is comparability — withdrawal must be as easy as granting. Extracted it as a parity requirement, since a withdrawal path that merely exists can still fail this section.",
+        input: { document: "DPDP Act 2023.pdf", section: "Section 6(4)" },
+        output: {
+          requirement_id: "DPDP-007",
+          citation: "DPDP Act 2023, Section 6(4)",
+          risk: "high",
+        },
+        handoffTo: "Coordinator Agent",
       },
     ],
     fdoSection:
@@ -665,6 +795,22 @@ export const items: ComplianceItem[] = [
         action: "Returned unknown",
         summary: "Consent evidence is stale — refused to guess, escalated for human verification.",
         confidence: 0.79,
+        reasoning:
+          "MKT-ADS-01 carries a generic marketing-consent flag and was last verified 2025-11-20. A stale record is not evidence of compliance, and it is not evidence of breach either — so the honest status is unknown. Defaulting to compliant would manufacture assurance the data does not support; defaulting to non_compliant would accuse Marketing on the strength of a missing audit. Escalated to the CCO with the decision stated.",
+        input: {
+          requirement_id: "DPDP-008",
+          practices: ["MKT-ADS-01"],
+          consent_evidence: "generic marketing flag",
+          last_verified_at: "2025-11-20",
+        },
+        output: {
+          assessment_status: "unknown",
+          escalated_to: "Chief Compliance Officer",
+          decision_required:
+            "Accept interim risk OR order a fresh purpose-linked consent audit",
+          blocked_on: "refreshed MKT-ADS-01 evidence",
+        },
+        handoffTo: "Chief Compliance Officer",
       },
     ],
     fdoSection:
@@ -763,6 +909,15 @@ export const items: ComplianceItem[] = [
         action: "Extracted requirement",
         summary: "Parsed Section 9.",
         confidence: 0.87,
+        reasoning:
+          "Section 9 applies on the basis of who signs up, not who the product targets. Extracted it as in-scope despite the product not being aimed at children — applicability is a legal test, not a marketing one.",
+        input: { document: "DPDP Act 2023.pdf", section: "Section 9" },
+        output: {
+          requirement_id: "DPDP-010",
+          citation: "DPDP Act 2023, Section 9",
+          risk: "low",
+        },
+        handoffTo: "Coordinator Agent",
       },
     ],
     fdoSection:
