@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 
 import { CookieConsent } from "@/components/CookieConsent";
@@ -33,6 +33,9 @@ export const Route = createFileRoute("/")({
    (critical / high / ok / unknown) are reserved for status and are never
    used decoratively.
    ------------------------------------------------------------------------- */
+
+// The Test Room lives outside this app, so it opens in its own tab.
+const TEST_ROOM_URL = "https://growthx.quirkylabs.ai";
 
 const EYEBROW = "font-mono text-[11px] font-medium uppercase tracking-[0.11em] text-primary";
 const DISPLAY_LG =
@@ -413,13 +416,21 @@ function Landing() {
             <a href="#trust" className="text-sm text-muted-foreground hover:text-foreground">
               Trust
             </a>
+            <a
+              href={TEST_ROOM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Test Room
+            </a>
           </div>
-          <a
-            href="#demo"
+          <Link
+            to="/app"
             className="rounded-full border border-border bg-card px-[18px] py-2.5 text-[15px] leading-none text-primary shadow-sm transition hover:bg-muted"
           >
-            Request a demo
-          </a>
+            Demo Dashboard
+          </Link>
         </div>
       </nav>
 
@@ -442,14 +453,35 @@ function Landing() {
             and tells each team what to fix.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3.5">
-            <a
-              href="#demo"
+            <Link
+              to="/app"
               className="rounded-full bg-primary px-[18px] py-2.5 text-[15px] leading-none text-primary-foreground shadow-sm transition hover:opacity-90"
             >
-              Request a demo
+              Demo Dashboard
+            </Link>
+            <a
+              href={TEST_ROOM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-[18px] py-2.5 text-[15px] leading-none text-primary shadow-sm transition hover:bg-muted"
+            >
+              Test Room
+              <svg
+                viewBox="0 0 12 12"
+                aria-hidden="true"
+                className="size-3 shrink-0 opacity-70"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4.5 2h5.5v5.5M10 2 4 8M8 10H2V4" />
+              </svg>
+              <span className="sr-only">(opens in a new tab)</span>
             </a>
-            <a href="#features" className="px-1 text-[15px] text-primary hover:opacity-80">
-              See how it works &rarr;
+            <a href="#demo" className="px-1 text-[15px] text-primary hover:opacity-80">
+              Request a demo &rarr;
             </a>
           </div>
 
