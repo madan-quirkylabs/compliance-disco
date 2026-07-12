@@ -1,202 +1,161 @@
-# Executive Compliance Report — DPDP Act 2023
+# Consolidated Compliance Report — DPDP Act 2023 & Rules 2025
 
-**Date:** 2026-07-12
-**Prepared by:** Consolidator Agent
-**Audience:** Leadership (CTO, CPO, CEO, DPO)
-
----
-
-## 1. Executive Summary
-
-The DPDP Act 2023 demands a foundational rewrite of how the organisation collects, processes, stores, and erases personal data. Across engineering and marketing, the regulation centres on three pillars: **explicit, documented consent** as the sole lawful basis for processing; **seamless withdrawal and erasure** rights that flow through every system; and **stringent protections for children's data** including an outright ban on tracking and targeted advertising for minors. Both departments share a critical dependency on a new central consent service, and the majority of P0 items must be operational before enforcement begins to avoid maximum penalty exposure.
+**Generated**: 2026-07-12
+**Source Body**: DPDP Board (Data Protection Board of India)
+**Regulation**: Digital Personal Data Protection Act, 2023 + DPDP Rules, 2025
 
 ---
 
-## 2. Consolidated Priority Table
+## Executive Summary
 
-### P0 — Must Ship Before Enforcement
+This report consolidates outputs from the Marketing and Engineering departments for the DPDP Act 2023 compliance pipeline. The regulation establishes India's comprehensive data protection framework, covering digital personal data of individuals in India. Substantive obligations come into force on **13 May 2027**, with Consent Manager obligations effective **13 November 2026**.
 
-| ID | Dept | Obligation | One-Line Action |
-|---|---|---|---|
-| REQ-1 | Engineering | OBL-001, OBL-005, OBL-007, OBL-008, OBL-010 | Build consent-svc microservice for consent capture, storage, withdrawal, and audit. |
-| REQ-2 | Engineering | OBL-002, OBL-003, OBL-004, OBL-006, OBL-035 | Implement consent-notice flow in web-app with itemised notice and 22-language support. |
-| REQ-3 | Engineering | OBL-016, OBL-017, OBL-038, OBL-039 | Build breach-detection pipeline with automated alerting and notification workflow. |
-| REQ-4 | Engineering | OBL-008, OBL-018, OBL-019, OBL-029, OBL-030, OBL-040, OBL-041, OBL-042 | Build cross-system erasure-orchestration pipeline with pre-erasure notice and inactive-account cron. |
-| MREQ-1 | Marketing | OBL-002 | Add privacy notice footer to all promotional emails with itemised data and rights links. |
-| MREQ-2 | Marketing | OBL-007 | Add one-click unsubscribe to email/SMS/WhatsApp — List-Unsubscribe, STOP keyword, quick-reply. |
-| MREQ-3 | Marketing | OBL-003 | Run re-notification campaign for all pre-commencement contacts within 60 days. |
-| MREQ-4 | Marketing | OBL-005 | Convert all web signup forms to explicit opt-in — no pre-checked boxes, separate purpose toggles. |
-| MREQ-6 | Marketing | OBL-008, OBL-010 | Integrate all marketing platforms (ESP, SMS, WhatsApp, ads) with central consent service. |
-| MREQ-7 | Marketing | OBL-024 | Block all child targeting — age gate on signup, exclude <18 on ad platforms, scrub existing DB. |
-| MREQ-12 | Marketing | OBL-035 | Ensure every consent request displays an independently understandable itemised notice. |
-
-### P1 — High Priority (Transition Period)
-
-| ID | Dept | Obligation | One-Line Action |
-|---|---|---|---|
-| REQ-5 | Engineering | OBL-015, OBL-016, OBL-038 | Remediate encryption-at-rest for Kafka, S3 legacy bucket, and Redis. |
-| REQ-6 | Engineering | OBL-015, OBL-038, OBL-042 | Extend CloudWatch log retention to 400 days and enrich audit events. |
-| REQ-7 | Engineering | OBL-021, OBL-031, OBL-032, OBL-052 | Build self-service grievance portal with 90-day SLA tracking and escalation. |
-| REQ-8 | Engineering | OBL-029, OBL-030, OBL-051 | Build self-service rights portal for correction, erasure, and data access requests. |
-| REQ-9 | Engineering | OBL-022, OBL-023, OBL-024, OBL-044, OBL-045 | Implement age-verification gating and verifiable parental consent for child data. |
-| REQ-14 | Engineering | OBL-034, OBL-050, OBL-053 | Enforce data residency to AWS ap-south-1 and block cross-region replication. |
-| MREQ-5 | Marketing | OBL-006, OBL-004 | Rewrite all consent copy to plain language (Grade 6) and add language selector. |
-| MREQ-8 | Marketing | OBL-018, OBL-030, OBL-008 | Implement erasure from all marketing databases within 7 business days of request. |
-| MREQ-9 | Marketing | OBL-014 | Validate all purchased/imported leads for consent provenance and data quality. |
-| MREQ-10 | Marketing | OBL-020, OBL-021, OBL-043 | Publish DPO contact on all marketing touchpoints and activate grievance portal. |
-| MREQ-11 | Marketing | OBL-007, OBL-008 | Sync opt-out for ad personalisation to suppression lists on all ad platforms. |
-
-### P2 — Important (Lower Risk / Supporting)
-
-| ID | Dept | Obligation | One-Line Action |
-|---|---|---|---|
-| REQ-10 | Engineering | OBL-020, OBL-043 | Publish DPO contact prominently on web-app and in all transactional emails. |
-| REQ-11 | Engineering | OBL-013 | Build processor contract registry with expiry tracking and gateway-level blocking. |
-| REQ-12 | Engineering | OBL-014 | Add data-quality validation middleware before any principal-affecting decisions. |
-| REQ-13 | Engineering | OBL-027, OBL-028, OBL-047, OBL-048, OBL-049 | Build SDF DPIA dashboard with algorithmic-software register and annual report export. |
-| REQ-15 | Engineering | OBL-001, OBL-011 | Extend consent-svc to support legitimate-use processing basis alongside consent. |
-| MREQ-13 | Marketing | OBL-017, OBL-039 | Document breach-notification runbook and add marketing-data contact extraction procedure. |
-| MREQ-14 | Marketing | OBL-022, OBL-044 | Build verifiable parental consent flow for child-accessible marketing services. |
-| MREQ-15 | Marketing | OBL-029 | Build self-service preference centre for data correction propagated to all platforms. |
-| MREQ-16 | Marketing | OBL-009 | Document consent APIs and test integration with at least one registered Consent Manager. |
+**57 obligations** were extracted from the regulation, mapped across 4 categories (consent/notice, security, rights/erasure, SDF-specific). Both departments have produced artifacts covering the full scope.
 
 ---
 
-## 3. Cross-Cutting Themes
+## Cross-Validation Results
 
-### 3.1 Consent as the Central Spine
+### ✅ Timeline Consistency
 
-The consent management service (REQ-1) is the single most critical dependency for both departments. **Everything else connects to it:**
+| Date | Milestone | Present In |
+|------|-----------|-----------|
+| 11 Aug 2023 | DPDP Act receives assent | summary.md, timelines.json, compliance-guide.md, faq.md, blog-post.md |
+| 13 Nov 2025 | Rules published (Rules 1, 2, 17-21 effective) | summary.md, timelines.json, all marketing + engineering artifacts |
+| 13 Nov 2026 | Consent Manager obligations (Rule 4) | timelines.json, checklist.md, faq.md, blog-post.md, implementation-guide.md |
+| 13 May 2027 | Majority of substantive rules in force | timelines.json, all marketing + engineering artifacts |
+| 3-year inactivity | Erasure for e-com/gaming/social media | timelines.json, data-classification.md, implementation-guide.md |
+| 72 hours | Breach detailed report to Board | timelines.json, compliance-guide.md, faq.md, implementation-guide.md |
+| 90 days | Grievance redressal response | timelines.json, compliance-guide.md, faq.md, checklist.md, implementation-guide.md |
 
-| Engineering Requirement | Marketing Requirement | Shared Dependency |
-|---|---|---|
-| REQ-1: Consent-svc | MREQ-6: Consent lifecycle integration | consent-svc APIs + webhook contracts |
-| REQ-2: Consent notice UX | MREQ-4: Valid consent forms | Same web-app consent flow |
-| REQ-2: Multilingual notices | MREQ-5: Plain language + language selector | Shared translation system |
-| REQ-2: Pre-existing re-notice | MREQ-3: Re-notify legacy leads | Shared opt-in/opt-out event stream |
-| REQ-15: Legitimate use basis | — | Consent-svc must support multiple processing bases |
+### ✅ Penalty Schedule Consistency
 
-**Recommendation:** The consent-svc (REQ-1) and multilingual consent UX (REQ-2) are the foundation. Do not start MREQ-6, MREQ-4, or MREQ-12 until these are stable.
+| Violation | Max Penalty | Source (penalties.json) | Marketing Artifacts | Engineering Artifacts |
+|-----------|-------------|------------------------|-------------------|---------------------|
+| Security safeguards breach (Schedule Item 1) | ₹250 crore | ✓ | ✓ | ✓ |
+| Breach notification failure (Item 2) | ₹200 crore | ✓ | ✓ | ✓ |
+| Children's data obligations (Item 3) | ₹200 crore | ✓ | ✓ | ✓ |
+| SDF obligations (Item 4) | ₹150 crore | ✓ | ✓ | ✓ |
+| Data Principal duties (Item 5) | ₹10,000 | ✓ | ✓ | — |
+| Voluntary undertaking breach (Item 6) | Linked to original | ✓ | — | ✓ |
+| General non-compliance (Item 7) | ₹50 crore | ✓ | ✓ | ✓ |
 
-### 3.2 Erasure & Withdrawal Propagation
+### ✅ Terminology Alignment
 
-Both departments need data to be erased when a user withdraws consent or requests deletion:
+All artifacts consistently use the statutory definitions from **definitions.json** (54 terms):
 
-| Engineering | Marketing | Shared Dependency |
-|---|---|---|
-| REQ-4: Cross-system erasure pipeline | MREQ-8: Erase marketing databases | Erasure event bus (Kafka) |
-| REQ-4: Inactive-account erasure (3-year) | MREQ-8: Inactive-account erasure | Same 3-year inactivity detection |
-| REQ-4: 48-hour pre-erasure notice | MREQ-8: 48-hour pre-erasure notice | Shared notification template |
-| REQ-4: State machine (RECEIVED→COMPLETE) | MREQ-2: 24-hour withdrawal propagation | Integration contract for erasure webhooks |
+| Term | Definition Source | Used In |
+|------|-----------------|---------|
+| Data Fiduciary | Section 2(i) | All artifacts |
+| Data Principal | Section 2(j) | All artifacts |
+| Significant Data Fiduciary | Section 2(z) | All artifacts |
+| Personal Data Breach | Section 2(u) | compliance-guide.md, faq.md, control-architecture.md, implementation-guide.md |
+| Verifiable Consent | Rule 2(1)(d) | compliance-guide.md, faq.md, implementation-guide.md |
+| Consent Manager | Section 2(g) | compliance-guide.md, faq.md, control-architecture.md |
 
-**Recommendation:** REQ-4 (erasure pipeline) must be built first; MREQ-8 and the erasure aspects of MREQ-2, MREQ-6, and MREQ-11 consume its events.
+### ✅ Obligation Coverage (57 of 57)
 
-### 3.3 Child Data Protections
-
-The Act's child provisions affect both departments heavily:
-
-| Engineering | Marketing | Shared Dependency |
-|---|---|---|
-| REQ-9: Age-verification gate | MREQ-7: Block child targeting | Shared age-declaration / age-verification service |
-| REQ-9: Verifiable parental consent | MREQ-14: Parental consent flow | Due-diligence identity verification API |
-| REQ-9: No tracking/ads for flagged users | MREQ-7: Ad audience exclusions | User profile `is_child` flag propagated to ad platforms |
-| REQ-9: Guardian consent for disabilities | — | Shared consent-svc extension |
-
-**Recommendation:** The age-verification gate and `is_child` flag (part of REQ-9) must precede MREQ-7's ad-audience scrubbing and MREQ-14's parental consent flow.
-
-### 3.4 Breach Notification
-
-Engineering builds the detection pipeline; marketing provides the delivery channel:
-
-| Engineering | Marketing | Shared Dependency |
-|---|---|---|
-| REQ-3: Breach detection + Board notification | MREQ-13: Contact-list extraction for affected users | Contact export API from marketing systems |
-| REQ-3: Data Principal notification automation | MREQ-13: Pre-approved notification templates | Email/SMS/WhatsApp delivery infrastructure |
-| REQ-3: Breach-case dashboard for DPO | — | — |
-
-**Recommendation:** REQ-3 owns the pipeline; MREQ-13 is a supporting process requirement. MREQ-13 templates can be prepared in parallel with engineering work.
-
-### 3.5 Grievance Redressal & Rights
-
-Engineering builds the infrastructure; marketing surfaces it:
-
-| Engineering | Marketing | Shared Dependency |
-|---|---|---|
-| REQ-7: Grievance portal with 90-day SLA | MREQ-10: Publish DPO contact + grievance portal link | Shared DPO contact DB record |
-| REQ-8: Rights portal (correction/erasure/access) | MREQ-15: Self-service preference centre | Same data-correction API |
-| REQ-8: Data export (JSON/CSV) | — | — |
-
-**Recommendation:** REQ-7 and REQ-8 must ship before MREQ-10's publicisation campaign begins. MREQ-15 can build on REQ-8's correction API.
-
-### 3.6 Audit, Logging & DPIA
-
-Supporting infrastructure that serves all other requirements:
-
-| Engineering | Marketing | Shared Dependency |
-|---|---|---|
-| REQ-6: Extended audit-log retention (400 days) | MREQ-13: 1-year log retention for breach investigation | Same CloudWatch log groups |
-| REQ-13: SDF annual DPIA dashboard | — | Consumes data from all requirements |
-| REQ-11: Processor contract registry | — | — |
-
-**Recommendation:** REQ-6 (audit log retention) is a dependency for every other requirement's audit trail. Start it early alongside REQ-1.
-
-### 3.7 Data Quality
-
-| Engineering | Marketing | Shared Dependency |
-|---|---|---|
-| REQ-12: Data-quality gates for decisions | MREQ-9: Validate purchased lead lists | Shared data-quality rules engine |
+- **Marketing**: Covers all obligation categories in compliance-guide.md (10 sections), checklist.md (8 phases, 53 items), faq.md (28 questions), blog-post.md (5 action areas).
+- **Engineering**: Mapped all obligations to 27 controls (control-architecture.md), 4-tier classification (data-classification.md), DPIA template (impact-assessment-template.md), 6-phase implementation (implementation-guide.md).
+- **Ambiguous obligations flagged**: 5 (OBL-003 "as soon as reasonably practicable", OBL-008 "reasonable time", OBL-018 "reasonable to assume", and 2 others).
 
 ---
 
-## 4. Recommended Sequencing
+## Artifact Inventory
 
-### Sprint 1-2: Foundation (Weeks 1-4)
-1. **REQ-1** — consent-svc (consent capture, storage, withdrawal API, audit trail)
-2. **REQ-2** — multilingual consent notice UI (language picker, itemised notice, pre-existing re-notice)
-3. **REQ-6** — extend CloudWatch log retention + enrich audit event schema
-4. **MREQ-4** — migrate all web signup forms to explicit opt-in (pairs with REQ-2 UI)
+### Extracted Regulation Data (5 files)
 
-### Sprint 3-4: Erasure & Withdrawal (Weeks 5-8)
-5. **REQ-4** — cross-system erasure pipeline (state machine, pre-erasure notice, inactive-account cron)
-6. **MREQ-2** — one-click unsubscribe on all channels (consumes REQ-4 events)
-7. **MREQ-3** — re-notification campaign for pre-commencement contacts (60-day deadline)
-8. **MREQ-12** — compliance audit of all consent notices on marketing channels
+| File | Size | Content |
+|------|------|---------|
+| `summary.md` | 5,848 chars | Full section-by-section breakdown of Act and Rules, schedules |
+| `obligations.json` | 31,783 chars | 57 obligations with IDs, sections, deadlines, penalty refs, ambiguity flags |
+| `definitions.json` | 14,775 chars | 54 defined terms across all categories (Core, Actor, Data, Process, Other) |
+| `timelines.json` | 5,320 chars | 18 timeline events with dates and related sections |
+| `penalties.json` | 2,159 chars | 7 penalty schedule items with amounts and determination criteria |
 
-### Sprint 5-6: Child Protections (Weeks 9-12)
-9. **REQ-9** — age-verification gate, `is_child` flag, verifiable parental consent flow
-10. **MREQ-7** — block child targeting (scrub ad audiences, exclude <18 in campaigns)
-11. **MREQ-14** — parental consent flow for marketing-adjacent services
+### Marketing Output (4 files)
 
-### Sprint 7-8: Breach, Grievance & Rights (Weeks 13-16)
-12. **REQ-3** — breach-detection pipeline + notification workflow
-13. **REQ-7** — grievance portal with 90-day SLA tracking
-14. **REQ-8** — rights portal (correction, erasure, data access)
-15. **MREQ-13** — breach-notification runbook + contact extraction procedure
+| File | Size | Content |
+|------|------|---------|
+| `compliance-guide.md` | 7,659 chars | 10-section business roadmap covering applicability, obligations, penalties, timeline |
+| `checklist.md` | 6,685 chars | 8-phase implementation checklist with 53 actionable items |
+| `faq.md` | 8,567 chars | 28 questions covering general, consent, children, security, rights, SDF, penalties |
+| `blog-post.md` | 7,369 chars | Executive summary with 5-action playbook and GDPR comparison |
 
-### Sprint 9-10: Full Integration (Weeks 17-20)
-16. **MREQ-6** — integrate all marketing platforms with consent-svc via webhooks
-17. **MREQ-5** — plain-language rewrite + language selector on all notices
-18. **MREQ-8** — marketing erasure pipeline (consumes REQ-4 events)
-19. **MREQ-10** + **REQ-10** — DPO contact publishing across all surfaces
-20. **MREQ-11** — ad-platform opt-out sync
+### Engineering Output (4 files)
 
-### Sprint 11-12: SDF & Remaining (Weeks 21-24)
-21. **REQ-5** — encryption-at-rest remediation (Kafka, S3, Redis)
-22. **REQ-14** — data-residency controls (AWS ap-south-1 lock-down)
-23. **REQ-13** — SDF DPIA / audit evidence dashboard
-24. **REQ-11** — processor contract registry
-25. **REQ-12** — data-quality validation gates
-26. **REQ-15** — legitimate-use processing basis
-27. **MREQ-9** — lead-list data-quality validation
-28. **MREQ-15** — self-service preference centre
-29. **MREQ-16** — Consent Manager integration
-
-### Ongoing (Start Sprint 1, Continue Through All Sprints)
-- **MREQ-1** — audit all email templates for privacy notice footer (incrementally)
-- Cross-team consent-svc integration testing per sprint
-- Quarterly DPIA evidence collection (starts after Sprint 10)
-- Monthly compliance posture reviews
+| File | Size | Content |
+|------|------|---------|
+| `data-classification.md` | 5,800 chars | C1-C4 tier classification mapped to system inventory, retention schedule, 7 gaps |
+| `control-architecture.md` | 14,716 chars | 27 controls mapped to ISO 27001/SOC 2/NIST 800-53, architecture diagram, priorities |
+| `impact-assessment-template.md` | 8,668 chars | Reusable DPIA with processing inventory, risk scoring, mitigation plan, algorithmic diligence |
+| `implementation-guide.md` | 16,719 chars | 6-phase plan (0-6), sprint estimates, consent-svc specification, risk register |
 
 ---
 
-*This report is auto-generated by the Consolidator Agent. All requirement IDs reference `engineering-requirements.md` (REQ-*) and `marketing-requirements.md` (MREQ-*).*
+## Gap Analysis
+
+### Critical Gaps Identified
+
+| Gap ID | Area | Description | Priority |
+|--------|------|-------------|----------|
+| DCL-01 / CTL-01 | Consent infrastructure | No consent capture or notice-display service exists | **Critical** |
+| DCL-05 / CTL-15 | Deletion orchestrator | No cross-system automated deletion pipeline | **Critical** |
+| CTL-12 | Breach response | No breach-response SOP aligned to Rule 7 timeline | **Critical** |
+| CTL-02 | Consent withdrawal | No mechanism with ease comparable to giving consent | **Critical** |
+| CTL-04 | Consent audit trail | No logging of consent lifecycle events (burden of proof) | **Critical** |
+| CTL-05 | Child verifiable consent | No age-verification or parent-consent flow | **High** |
+| DCL-02 / CTL-07 | Kafka encryption | Events (Kafka) unencrypted | **High** |
+| DCL-03 / CTL-07 | S3 encryption | Legacy blob-store bucket lacks encryption | **High** |
+| DCL-06 / CTL-18 | Log retention | Logs retained 90 days, need 1 year minimum | **High** |
+
+### Key Milestone Summary
+
+```
+Now        2026-11-13       2027-05-13
+  │            │                │
+  ▼            ▼                ▼
+┌──────┐  ┌─────────┐  ┌──────────────┐
+│Phase │  │Consent  │  │MAJORITY OF   │
+│0-1:  │  │Manager  │  │RULES IN FORCE│
+│Found.│  │Reg.     │  │- Notices      │
+│Data  │  │(Rule 4) │  │- Security     │
+│Map   │  │         │  │- Breach notif │
+│Cons. │  │         │  │- Erasure      │
+│Svc   │  │         │  │- Rights       │
+└──────┘  └─────────┘  └──────────────┘
+```
+
+---
+
+## Department Coordination View
+
+| Theme | Marketing Coverage | Engineering Coverage | Alignment |
+|-------|-------------------|---------------------|-----------|
+| **Consent & Notice** | compliance-guide §3.1-3.3, checklist Phase 2, FAQ Q5-Q9, blog-post step 2 | control-architecture §1.1, implementation-guide Phase 1, data-classification §6 | ✅ Fully aligned. Marketing explains the what/why; Engineering specifies the how (consent-svc) |
+| **Security Safeguards** | compliance-guide §3.4, checklist Phase 3, FAQ Q14, blog-post step 3 | control-architecture §1.2, data-classification §2, implementation-guide Phase 2 | ✅ Aligned. Encryption, RBAC, logging all mapped to specific system gaps |
+| **Breach Response** | compliance-guide §3.5, checklist Phase 4, FAQ Q15-Q16, blog-post step 4 | control-architecture §1.3, implementation-guide Phase 3 | ✅ Aligned. Same Rule 7 timeline (immediate + 72h) used by both |
+| **Children's Data** | compliance-guide §5, checklist Phase 6, FAQ Q10-Q13, blog-post step 5 | control-architecture CTL-05/CTL-06, implementation-guide §1.2 | ✅ Aligned. Marketing explains exemptions (Fourth Schedule); Engineering specifies verifiable-consent pipeline |
+| **Erasure & Retention** | compliance-guide §3.6, checklist Phase 5 items, FAQ Q17-Q18 | control-architecture §1.4, data-classification §5, implementation-guide §4.2 | ✅ Aligned. Same retention periods (3yr inactivity, 1yr logs, 48hr notice) |
+| **SDF Obligations** | compliance-guide §4, checklist Phase 7, FAQ Q19-Q20, blog-post SDF section | control-architecture §1.6, implementation-guide Phase 5, impact-assessment-template | ✅ Aligned. DPIA/audit schedule, DPO, data auditor all referenced consistently |
+| **Cross-Border Transfers** | compliance-guide §7, FAQ Q21-Q22, blog-post §GDPR comparison | data-classification §4, control-architecture CTL-27, implementation-guide §5.4 | ✅ Aligned. All note "pending Government notification" as key uncertainty |
+
+---
+
+## Conclusion
+
+The DPDP Act 2023 compliance pipeline has produced **13 artifacts** across extraction, marketing, and engineering departments. Cross-validation confirms:
+
+1. **Timeline consistency**: All dates match the extracted timelines.json across every downstream artifact
+2. **Penalty consistency**: All 7 penalty schedule items match exactly between extracted data and all marketing/engineering references
+3. **Terminology alignment**: All 54 defined terms used consistently across all departments
+4. **Complete obligation coverage**: All 57 obligations addressed by at least one artifact; most by both marketing and engineering
+5. **Gap identification aligned**: Marketing checklist items map directly to engineering control gaps (DCL-01 ↔ CTL-01, etc.)
+
+**Key readiness date**: **13 May 2027** — 18 months from Rules publication — when the majority of compliance obligations become enforceable.
+
+**Total artifact count**: 13 files | **Total size**: ~136 KB | **Controls identified**: 27 (6 Critical, 12 High priority)
+
+---
+
+*Report generated by Consolidator from Marketing + Engineering handoffs. Cross-referenced against extracted regulation data.*
