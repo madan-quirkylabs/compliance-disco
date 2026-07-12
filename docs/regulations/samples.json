@@ -1,0 +1,33 @@
+{
+  "_comment": "Catalog of sample regulations for the pipeline. 'folder' is the sub-directory under docs/regulations/ where the PDF(s) live. Bundled samples ship with PDFs; others link to the official source — download the PDF, drop it into the folder (or upload via the UI), then run.",
+  "samples": [
+    {
+      "folder": "dpdp",
+      "name": "DPDP Act 2023",
+      "body": "DPDP Board",
+      "source_url": "https://www.meity.gov.in/data-protection-framework",
+      "description": "India's Digital Personal Data Protection Act 2023 + Rules 2025. Bundled in this repo."
+    },
+    {
+      "folder": "gdpr",
+      "name": "GDPR (Regulation 2016/679)",
+      "body": "European Commission",
+      "source_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+      "description": "EU General Data Protection Regulation. Download the official PDF from EUR-Lex."
+    },
+    {
+      "folder": "hipaa",
+      "name": "HIPAA Privacy Rule",
+      "body": "US Dept. of Health & Human Services",
+      "source_url": "https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html",
+      "description": "US health-data privacy rule (45 CFR Part 160 & Part 164). Download from HHS.gov."
+    },
+    {
+      "folder": "ccpa",
+      "name": "CCPA",
+      "body": "California Attorney General",
+      "source_url": "https://oag.ca.gov/privacy/ccpa",
+      "description": "California Consumer Privacy Act. Download the text from the CA Attorney General."
+    }
+  ]
+}

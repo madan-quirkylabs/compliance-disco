@@ -51,6 +51,28 @@ def slugify(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-") or "reg"
 
 
+def list_samples():
+    """Catalog from samples.json, plus any folder with PDFs auto-detected as runnable."""
+    entries, seen = [], set()
+    manifest = REG_DIR / "samples.json"
+    if manifest.exists():
+        try:
+            for s in json.loads(manifest.read_text()).get("samples", []):
+                folder = s.get("folder", "")
+                seen.add(folder)
+                ready = bool(list((REG_DIR / folder).glob("*.pdf"))) if folder else False
+                entries.append({"folder": folder, "name": s.get("name", folder),
+                                "body": s.get("body", ""), "source_url": s.get("source_url", ""),
+                                "description": s.get("description", ""), "ready": ready})
+        except Exception:
+            pass
+    for d in sorted(REG_DIR.glob("*/")):
+        if d.name not in seen and list(d.glob("*.pdf")):
+            entries.append({"folder": d.name, "name": d.name, "body": "",
+                            "source_url": "", "description": "", "ready": True})
+    return entries
+
+
 def run_pipeline(reg_name: str, body: str, folder: str):
     """Full chain: pdf2text -> extract -> run_pipeline.sh -> archive report."""
     STATE.update(running=True, step="starting", log="", error=None, last_report=None)
@@ -115,6 +137,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif u.path == "/reports":
             files = sorted((p.name for p in ARCHIVE.glob("*.md")), reverse=True)
             self._send(200, json.dumps(files))
+        elif u.path == "/samples":
+            self._send(200, json.dumps(list_samples()))
         elif u.path == "/report":
             name = os.path.basename((q.get("name") or [""])[0])
             f = ARCHIVE / name
@@ -188,6 +212,11 @@ PAGE = r"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
  .empty{color:#666;font-size:.85rem}
 </style></head><body><div class="wrap">
  <header><h1>Compliance-Disco</h1><div class="sub">Regulation PDF → per-department requirements → executive report</div></header>
+ <div class="card" style="margin-bottom:1.5rem">
+   <h2>Sample regulations</h2>
+   <div style="color:#888;font-size:.8rem;margin-bottom:.7rem">Click a bundled sample to load it below, then Run. Others link to their official source — download the PDF, drop it in the folder (or upload below), then Run.</div>
+   <ul class="reports" id="samples"><li class="empty">loading…</li></ul>
+ </div>
  <div class="grid">
    <div class="card">
      <h2>① Feed the pipeline</h2>
@@ -263,7 +292,28 @@ function mdToHtml(md){
   if(inTable)html+='</table>'; if(inList)html+='</ul>';
   return html;
 }
-loadReports();
+async function loadSamples(){
+  const items=await(await fetch('/samples')).json();
+  const ul=document.getElementById('samples');
+  ul.innerHTML = items.length? '' : '<li class="empty">No samples found.</li>';
+  items.forEach(x=>{
+    const li=document.createElement('li');
+    const badge = x.ready
+      ? '<span style="color:#4ade80">● ready — click to load</span>'
+      : (x.source_url? `<a href="${x.source_url}" target="_blank" onclick="event.stopPropagation()" style="color:#60a5fa">⬇ download from source</a>` : '');
+    li.innerHTML = `<strong>${x.name}</strong> <span style="color:#888">— ${x.body}</span> &nbsp; ${badge}`
+      + (x.ready? '' : `<div style="color:#777;font-size:.74rem;margin-top:.25rem">drop the PDF into docs/regulations/${x.folder}/ (or upload it below), then Run</div>`);
+    li.onclick=()=>useSample(x);
+    ul.appendChild(li);
+  });
+}
+function useSample(x){
+  document.getElementById('reg').value=x.name;
+  document.getElementById('body').value=x.body||x.folder;
+  document.getElementById('folder').value=x.folder;
+  document.getElementById('reg').scrollIntoView({behavior:'smooth'});
+}
+loadSamples(); loadReports();
 </script></body></html>"""
 
 
