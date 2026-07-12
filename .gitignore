@@ -11,3 +11,15 @@ agents/*/.hermes/
 # Large PDF-text intermediate + per-run report archive (regenerated at runtime)
 workspace/shared-data/extracted-regulations/raw.txt
 consolidated-output/*.md
+
+# ── Generated pipeline outputs (regenerated at runtime; not source) ──
+workspace/shared-data/extracted-regulations/*
+workspace/shared-data/engineering-output/*
+workspace/shared-data/marketing-output/*
+workspace/shared-data/consolidated-output/*
+workspace/shared-data/handoffs/*
+workspace/shared-data/detection-log/*
+workspace/shared-data/run-history/*
+docs/regulations/**/*.txt
+consolidated-output/*.md
+!**/.gitkeep
