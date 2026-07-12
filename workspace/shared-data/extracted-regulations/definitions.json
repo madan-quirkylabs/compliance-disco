@@ -1,0 +1,356 @@
+[
+  {
+    "term": "Act",
+    "definition": "The Digital Personal Data Protection Act, 2023 (22 of 2023).",
+    "section": "Rule 2(1)(a)",
+    "category": "Other"
+  },
+  {
+    "term": "Appellate Tribunal",
+    "definition": "The Telecom Disputes Settlement and Appellate Tribunal established under section 14 of the Telecom Regulatory Authority of India Act, 1997.",
+    "section": "Section 2(a)",
+    "category": "Core"
+  },
+  {
+    "term": "automated",
+    "definition": "Any digital process capable of operating automatically in response to instructions given or otherwise for the purpose of processing data.",
+    "section": "Section 2(b)",
+    "category": "Process"
+  },
+  {
+    "term": "Board",
+    "definition": "The Data Protection Board of India established by the Central Government under section 18.",
+    "section": "Section 2(c)",
+    "category": "Core"
+  },
+  {
+    "term": "certain legitimate uses",
+    "definition": "The uses referred to in section 7.",
+    "section": "Section 2(d)",
+    "category": "Other"
+  },
+  {
+    "term": "Chairperson",
+    "definition": "The Chairperson of the Board.",
+    "section": "Section 2(e)",
+    "category": "Actor"
+  },
+  {
+    "term": "child",
+    "definition": "An individual who has not completed the age of eighteen years.",
+    "section": "Section 2(f)",
+    "category": "Data"
+  },
+  {
+    "term": "Consent Manager",
+    "definition": "A person registered with the Board, who acts as a single point of contact to enable a Data Principal to give, manage, review and withdraw her consent through an accessible, transparent and interoperable platform.",
+    "section": "Section 2(g)",
+    "category": "Actor"
+  },
+  {
+    "term": "data",
+    "definition": "Representation of information, facts, concepts, opinions or instructions in a manner suitable for communication, interpretation or processing by human beings or by automated means.",
+    "section": "Section 2(h)",
+    "category": "Data"
+  },
+  {
+    "term": "Data Fiduciary",
+    "definition": "Any person who alone or in conjunction with other persons determines the purpose and means of processing of personal data.",
+    "section": "Section 2(i)",
+    "category": "Actor"
+  },
+  {
+    "term": "Data Principal",
+    "definition": "The individual to whom the personal data relates and where such individual is\u2014(i) a child, includes the parents or lawful guardian of such a child; (ii) a person with disability, includes her lawful guardian, acting on her behalf.",
+    "section": "Section 2(j)",
+    "category": "Actor"
+  },
+  {
+    "term": "Data Processor",
+    "definition": "Any person who processes personal data on behalf of a Data Fiduciary.",
+    "section": "Section 2(k)",
+    "category": "Actor"
+  },
+  {
+    "term": "Data Protection Officer",
+    "definition": "An individual appointed by the Significant Data Fiduciary under clause (a) of sub-section (2) of section 10.",
+    "section": "Section 2(l)",
+    "category": "Actor"
+  },
+  {
+    "term": "digital office",
+    "definition": "An office that adopts an online mechanism wherein the proceedings, from receipt of intimation or complaint or reference or directions or appeal, as the case may be, to the disposal thereof, are conducted in online or digital mode.",
+    "section": "Section 2(m)",
+    "category": "Process"
+  },
+  {
+    "term": "digital personal data",
+    "definition": "Personal data in digital form.",
+    "section": "Section 2(n)",
+    "category": "Data"
+  },
+  {
+    "term": "gain",
+    "definition": "(i) a gain in property or supply of services, whether temporary or permanent; or (ii) an opportunity to earn remuneration or greater remuneration or to gain a financial advantage otherwise than by way of legitimate remuneration.",
+    "section": "Section 2(o)",
+    "category": "Other"
+  },
+  {
+    "term": "loss",
+    "definition": "(i) a loss in property or interruption in supply of services, whether temporary or permanent; or (ii) a loss of opportunity to earn remuneration or greater remuneration or to gain a financial advantage otherwise than by way of legitimate remuneration.",
+    "section": "Section 2(p)",
+    "category": "Other"
+  },
+  {
+    "term": "Member",
+    "definition": "A Member of the Board and includes the Chairperson.",
+    "section": "Section 2(q)",
+    "category": "Actor"
+  },
+  {
+    "term": "notification",
+    "definition": "A notification published in the Official Gazette; 'notify' and 'notified' shall be construed accordingly.",
+    "section": "Section 2(r)",
+    "category": "Other"
+  },
+  {
+    "term": "person",
+    "definition": "Includes\u2014(i) an individual; (ii) a Hindu undivided family; (iii) a company; (iv) a firm; (v) an association of persons or a body of individuals, whether incorporated or not; (vi) the State; and (vii) every artificial juristic person, not falling within any of the preceding sub-clauses.",
+    "section": "Section 2(s)",
+    "category": "Actor"
+  },
+  {
+    "term": "personal data",
+    "definition": "Any data about an individual who is identifiable by or in relation to such data.",
+    "section": "Section 2(t)",
+    "category": "Data"
+  },
+  {
+    "term": "personal data breach",
+    "definition": "Any unauthorised processing of personal data or accidental disclosure, acquisition, sharing, use, alteration, destruction or loss of access to personal data, that compromises the confidentiality, integrity or availability of personal data.",
+    "section": "Section 2(u)",
+    "category": "Process"
+  },
+  {
+    "term": "prescribed",
+    "definition": "Prescribed by rules made under this Act.",
+    "section": "Section 2(v)",
+    "category": "Other"
+  },
+  {
+    "term": "proceeding",
+    "definition": "Any action taken by the Board under the provisions of this Act.",
+    "section": "Section 2(w)",
+    "category": "Process"
+  },
+  {
+    "term": "processing",
+    "definition": "A wholly or partly automated operation or set of operations performed on digital personal data, and includes operations such as collection, recording, organisation, structuring, storage, adaptation, retrieval, use, alignment or combination, indexing, sharing, disclosure by transmission, dissemination or otherwise making available, restriction, erasure or destruction.",
+    "section": "Section 2(x)",
+    "category": "Process"
+  },
+  {
+    "term": "she",
+    "definition": "In relation to an individual includes the reference to such individual irrespective of gender.",
+    "section": "Section 2(y)",
+    "category": "Other"
+  },
+  {
+    "term": "Significant Data Fiduciary",
+    "definition": "Any Data Fiduciary or class of Data Fiduciaries as may be notified by the Central Government under section 10.",
+    "section": "Section 2(z)",
+    "category": "Actor"
+  },
+  {
+    "term": "specified purpose",
+    "definition": "The purpose mentioned in the notice given by the Data Fiduciary to the Data Principal in accordance with the provisions of this Act and the rules made thereunder.",
+    "section": "Section 2(za)",
+    "category": "Process"
+  },
+  {
+    "term": "State",
+    "definition": "The State as defined under article 12 of the Constitution.",
+    "section": "Section 2(zb)",
+    "category": "Actor"
+  },
+  {
+    "term": "techno-legal measures",
+    "definition": "As referred to under rules 20 and 22.",
+    "section": "Rule 2(1)(b)",
+    "category": "Process"
+  },
+  {
+    "term": "user account",
+    "definition": "The online account registered by the Data Principal with the Data Fiduciary, and includes any profiles, pages, handles, email address, mobile number and other similar presences by means of which such Data Principal is able to access the services of such Data Fiduciary.",
+    "section": "Rule 2(1)(c)",
+    "category": "Other"
+  },
+  {
+    "term": "verifiable consent",
+    "definition": "A consent as specified in rule 10 or 11.",
+    "section": "Rule 2(1)(d)",
+    "category": "Process"
+  },
+  {
+    "term": "adult",
+    "definition": "An individual who has completed the age of eighteen years.",
+    "section": "Rule 10(2)(a)",
+    "category": "Data"
+  },
+  {
+    "term": "authorised entity",
+    "definition": "(i) an entity entrusted by law or by the Central Government or by the State Government with the issuance of details of the identity and age or a virtual token mapped to such details; or (ii) a person appointed or permitted by the entity specified under clause (i), for such issuance, and also includes details of identity and age or token made available and verified by a Digital Locker Service Provider.",
+    "section": "Rule 10(2)(b)",
+    "category": "Actor"
+  },
+  {
+    "term": "Digital Locker service provider",
+    "definition": "Such intermediary, including a body corporate or an agency of the appropriate Government, as may be notified by the Central Government, in accordance with the rules made in this regard under the Information Technology Act, 2000.",
+    "section": "Rule 10(2)(c)",
+    "category": "Actor"
+  },
+  {
+    "term": "designated authority",
+    "definition": "An authority designated under section 15 of the Rights of Persons with Disabilities Act, 2016 to support persons with disabilities in exercise of their legal capacity.",
+    "section": "Rule 11(2)(a)",
+    "category": "Actor"
+  },
+  {
+    "term": "law applicable to guardianship",
+    "definition": "(i) in relation to an individual who has long term physical, mental, intellectual or sensory impairment... unable to take legally binding decisions, the provisions of law contained in Rights of Persons with Disabilities Act, 2016 and rules made thereunder; and (ii) in relation to a person suffering from autism, cerebral palsy, mental retardation etc., the provisions of law of the National Trust for the Welfare of Persons with Autism, Cerebral Palsy, Mental Retardation and Multiple Disabilities Act, 1999 and rules made thereunder.",
+    "section": "Rule 11(2)(b)",
+    "category": "Other"
+  },
+  {
+    "term": "local level committee",
+    "definition": "A local level committee constituted under section 13 of the National Trust for the Welfare of Persons with Autism, Cerebral Palsy, Mental Retardation and Multiple Disabilities Act, 1999.",
+    "section": "Rule 11(2)(c)",
+    "category": "Actor"
+  },
+  {
+    "term": "person with disability",
+    "definition": "Includes (i) an individual with long term physical, mental, intellectual or sensory impairment hindering full participation despite support unable to take legally binding decisions; and (ii) an individual suffering from autism, cerebral palsy, mental retardation etc. and unable to take legally binding decisions.",
+    "section": "Rule 11(2)(d)",
+    "category": "Data"
+  },
+  {
+    "term": "e-commerce entity",
+    "definition": "Any person who owns, operates or manages a digital facility or platform for e-commerce as defined in the Consumer Protection Act, 2019, but does not include a seller offering goods or services for sale on a marketplace e-commerce entity.",
+    "section": "Third Schedule Note (a)",
+    "category": "Actor"
+  },
+  {
+    "term": "online gaming intermediary",
+    "definition": "Any intermediary who enables the users of its computer resource to access one or more online games.",
+    "section": "Third Schedule Note (b)",
+    "category": "Actor"
+  },
+  {
+    "term": "social media intermediary",
+    "definition": "An intermediary as defined in clause (w) of sub-rule (1) of rule 2 of the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021.",
+    "section": "Third Schedule Note (c)",
+    "category": "Actor"
+  },
+  {
+    "term": "user",
+    "definition": "In relation to e-commerce entity: any person who accesses or avails any computer resource of an e-commerce entity; in relation to online gaming intermediary or social media intermediary: any person who accesses or avails of any computer resource of an intermediary for the purpose of hosting, publishing, sharing, transacting, viewing, displaying, downloading or uploading information.",
+    "section": "Third Schedule Note (d)",
+    "category": "Data"
+  },
+  {
+    "term": "advertisement",
+    "definition": "Shall have the same meaning as assigned to it in the Consumer Protection Act, 2019.",
+    "section": "Fourth Schedule Note (a)",
+    "category": "Other"
+  },
+  {
+    "term": "allied healthcare professional",
+    "definition": "Shall have the same meaning as assigned to it in clause (d) of section 2 of the National Commission for Allied and Healthcare Professions Act, 2021.",
+    "section": "Fourth Schedule Note (a)(i) [likely typo in text: two (a) notes; renumbered as (a) for first?]",
+    "category": "Actor"
+  },
+  {
+    "term": "clinical establishment",
+    "definition": "Shall have the same meaning as assigned to it in clause (c) of section 2 of the Clinical Establishments (Registration and Regulation) Act, 2010.",
+    "section": "Fourth Schedule Note (b)",
+    "category": "Actor"
+  },
+  {
+    "term": "educational institution",
+    "definition": "Means and includes an institution of learning that imparts education, including vocational education.",
+    "section": "Fourth Schedule Note (c)",
+    "category": "Actor"
+  },
+  {
+    "term": "healthcare professional",
+    "definition": "Shall have the same meaning as assigned to it in clause (j) of section 2 of the National Commission for Allied and Healthcare Professions Act, 2021.",
+    "section": "Fourth Schedule Note (d)",
+    "category": "Actor"
+  },
+  {
+    "term": "health services",
+    "definition": "The services required to be provided by a healthcare professional as referred to in clause (j) of section 2 of the National Commission for Allied and Healthcare Professions Act, 2021.",
+    "section": "Fourth Schedule Note (e)",
+    "category": "Other"
+  },
+  {
+    "term": "mental health establishment",
+    "definition": "Shall have the same meaning as assigned to it in clause (p) of sub-section (1) of section 2 of the Mental Healthcare Act, 2017.",
+    "section": "Fourth Schedule Note (f)",
+    "category": "Actor"
+  },
+  {
+    "term": "body corporate",
+    "definition": "Includes a company, a body corporate as defined under clause (11) of section 2 of the Companies Act, 2013, a firm, a financial institution, a scheduled bank or a public sector enterprise, and any other incorporated association of persons or body of individuals.",
+    "section": "First Schedule Note (a)",
+    "category": "Actor"
+  },
+  {
+    "term": "company",
+    "definition": "Shall have the same meaning as assigned to it in the Companies Act, 2013.",
+    "section": "First Schedule Note (b)",
+    "category": "Actor"
+  },
+  {
+    "term": "control",
+    "definition": "Shall have the same meaning as assigned to it in the Companies Act, 2013.",
+    "section": "First Schedule Note (b)",
+    "category": "Other"
+  },
+  {
+    "term": "director",
+    "definition": "Shall have the same meaning as assigned to it in the Companies Act, 2013.",
+    "section": "First Schedule Note (b)",
+    "category": "Actor"
+  },
+  {
+    "term": "key managerial personnel",
+    "definition": "Shall have the same meaning as assigned to it in the Companies Act, 2013.",
+    "section": "First Schedule Note (b)",
+    "category": "Actor"
+  },
+  {
+    "term": "net worth",
+    "definition": "The aggregate value of total assets as reduced by the value of liabilities of the Consent Manager as appearing in its books of accounts.",
+    "section": "First Schedule Note (c)",
+    "category": "Other"
+  },
+  {
+    "term": "promoter",
+    "definition": "Shall have the same meaning as assigned to it in the Companies Act, 2013.",
+    "section": "First Schedule Note (d)",
+    "category": "Actor"
+  },
+  {
+    "term": "senior management",
+    "definition": "Shall have the same meaning as assigned to it in the Companies Act, 2013.",
+    "section": "First Schedule Note (d)",
+    "category": "Actor"
+  },
+  {
+    "term": "pay matrix",
+    "definition": "The pay matrix specified in Annexure I to the Central Government\u2019s Resolution published in the Official Gazette vide Notification no. 1-2/2016-IC, dated the 25th July, 2016.",
+    "section": "Fifth Schedule paragraph 9",
+    "category": "Other"
+  }
+]

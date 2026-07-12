@@ -1,0 +1,44 @@
+[
+  {
+    "section": "Schedule - Item 1",
+    "offense": "Breach in observing obligation of Data Fiduciary to take reasonable security safeguards to prevent personal data breach under section 8(5).",
+    "penalty_amount": "May extend to two hundred and fifty crore rupees",
+    "criteria": "Determined by Board under section 33(2) considering nature, gravity, duration, type of data, repetition, gain/loss, mitigation, proportionality, impact."
+  },
+  {
+    "section": "Schedule - Item 2",
+    "offense": "Breach in observing obligation to give the Board or affected Data Principal notice of a personal data breach under section 8(6).",
+    "penalty_amount": "May extend to two hundred crore rupees",
+    "criteria": "Same as above."
+  },
+  {
+    "section": "Schedule - Item 3",
+    "offense": "Breach in observance of additional obligations in relation to children under section 9 (verifiable consent, detrimental processing, tracking/advertising).",
+    "penalty_amount": "May extend to two hundred crore rupees",
+    "criteria": "Same as above."
+  },
+  {
+    "section": "Schedule - Item 4",
+    "offense": "Breach in observance of additional obligations of Significant Data Fiduciary under section 10 (appoint DPO, auditor, DPIA, audit, etc.).",
+    "penalty_amount": "May extend to one hundred and fifty crore rupees",
+    "criteria": "Same as above."
+  },
+  {
+    "section": "Schedule - Item 5",
+    "offense": "Breach in observance of the duties of Data Principal under section 15.",
+    "penalty_amount": "May extend to ten thousand rupees",
+    "criteria": "Same as above but capped at \u20b910,000."
+  },
+  {
+    "section": "Schedule - Item 6",
+    "offense": "Breach of any term of voluntary undertaking accepted by the Board under section 32.",
+    "penalty_amount": "Up to the extent applicable for the breach in respect of which the proceedings under section 28 were instituted.",
+    "criteria": "The penalty applicable for the underlying breach."
+  },
+  {
+    "section": "Schedule - Item 7",
+    "offense": "Breach of any other provision of this Act or the rules made thereunder (not covered by items 1-6).",
+    "penalty_amount": "May extend to fifty crore rupees",
+    "criteria": "Same as above."
+  }
+]

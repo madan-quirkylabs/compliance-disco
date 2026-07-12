@@ -1,0 +1,111 @@
+[
+  {
+    "event": "DPDP Act receives Presidential assent",
+    "date": "2023-08-11",
+    "description": "The Digital Personal Data Protection Act, 2023 received assent of the President on 11 August 2023.",
+    "related_sections": [
+      "Section 1(1)"
+    ]
+  },
+  {
+    "event": "DPDP Act commencement (to be notified)",
+    "date": "TBD",
+    "description": "Act shall come into force on such date as Central Government may appoint; different dates for different provisions.",
+    "related_sections": [
+      "Section 1(2)"
+    ]
+  },
+  {
+    "event": "DPDP Rules 2025 published in Gazette",
+    "date": "2025-11-13",
+    "description": "Notification G.S.R. 846(E) dated 13th November, 2025 published the Digital Personal Data Protection Rules, 2025.",
+    "related_sections": [
+      "Rule 1(1)"
+    ]
+  },
+  {
+    "event": "Rules 1, 2, 17-21 come into force",
+    "date": "2025-11-13",
+    "description": "Rules 1 (short title and commencement), 2 (definitions), and 17 to 21 (appointment, salary, meetings, digital office, terms of officers) came into force on the date of publication.",
+    "related_sections": [
+      "Rule 1(2)",
+      "Rule 17",
+      "Rule 18",
+      "Rule 19",
+      "Rule 20",
+      "Rule 21"
+    ]
+  },
+  {
+    "event": "Rule 4 (Consent Manager registration) comes into force",
+    "date": "2026-11-13",
+    "description": "Rule 4 shall come into force one year after the date of publication of the Rules (i.e., 13 November 2026).",
+    "related_sections": [
+      "Rule 1(3)",
+      "Rule 4"
+    ]
+  },
+  {
+    "event": "Remaining Rules (3, 5-16, 22-23) come into force",
+    "date": "2027-05-13",
+    "description": "Rules 3, 5 to 16, 22 and 23 shall come into force eighteen months after publication, i.e., 13 May 2027 (approximately).",
+    "related_sections": [
+      "Rule 1(4)",
+      "Rule 3",
+      "Rule 5",
+      "Rule 6",
+      "Rule 7",
+      "Rule 8",
+      "Rule 9",
+      "Rule 10",
+      "Rule 11",
+      "Rule 12",
+      "Rule 13",
+      "Rule 14",
+      "Rule 15",
+      "Rule 16",
+      "Rule 22",
+      "Rule 23"
+    ]
+  },
+  {
+    "event": "Appeal to Appellate Tribunal period",
+    "date": "TBD",
+    "description": "Appeal must be filed within 60 days from date of receipt of order or direction of the Board.",
+    "related_sections": [
+      "Section 29(2)"
+    ]
+  },
+  {
+    "event": "Board inquiry completion period",
+    "date": "TBD",
+    "description": "Inquiry by Board shall be completed within 6 months from receipt of intimation/complaint/reference/direction, extendable by up to 3 months at a time.",
+    "related_sections": [
+      "Rule 19(9)"
+    ]
+  },
+  {
+    "event": "Appellate Tribunal disposal period",
+    "date": "TBD",
+    "description": "Appellate Tribunal shall endeavor to dispose of appeal within 6 months from date of presentation.",
+    "related_sections": [
+      "Section 29(6)"
+    ]
+  },
+  {
+    "event": "Penalty amount cap amendment restriction",
+    "date": "TBD",
+    "description": "Central Government may amend Schedule but cannot increase penalty to more than twice the original amount.",
+    "related_sections": [
+      "Section 42(1)"
+    ]
+  },
+  {
+    "event": "Power to remove difficulties expires",
+    "date": "TBD (3 years from Act commencement)",
+    "description": "Central Government cannot make orders under section 43 after expiry of 3 years from Act commencement.",
+    "related_sections": [
+      "Section 43(2)"
+    ]
+  }
+]
