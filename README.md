@@ -1,148 +1,167 @@
 # Compliance-Disco
 
 Automated compliance monitoring and multi-department analysis for any regulation.
-Built on [Hermes Agent](https://hermes-agent.nousresearch.com/) — "AI as Agency" track, Hermes Buildathon 2026.
+Built on [Hermes Agent](https://hermes-agent.nousresearch.com/) — Hermes Buildathon 2026.
 
-## What This Does for You
+## What This Does
 
-As a Chief Compliance Officer, you watch 10+ regulatory bodies for changes.
-This system does that for you — automatically, 24/7.
+Monitors regulatory bodies (SEBI, AMFI, RBI, IRDAI, TRAI, and others) for new
+publications. When something changes, it automatically:
 
-When a new regulation, circular, or notification is published by SEBI, AMFI,
-RBI, or any other body you configure, the system:
+1. **Detects** the new regulation or circular
+2. **Extracts** every obligation, deadline, and penalty
+3. **Analyzes** the impact from every department's perspective
+4. **Delivers** a single report with what to do, who does it, and by when
 
-1. **Detects** the new publication (cron-driven monitoring, every 6 hours)
-2. **Extracts** structured obligations, timelines, and penalties
-3. **Analyzes** the impact from every department's perspective:
-   - **Marketing:** customer-facing compliance guides, checklists, FAQs
-   - **Engineering:** technical controls, data schemas, implementation plans
-4. **Delivers** a unified compliance report with actionable next steps
+You go from "something changed, now what?" to "here's exactly what we need to do"
+— automatically.
 
-## How to Use It
+---
 
-### One-Time Setup (requires Hermes Agent)
+## For the Chief Compliance Officer
+
+### What You Do Day-to-Day
+
+**Almost nothing.** The system runs on autopilot.
+
+**When you receive a report** (delivered to your dashboard or messaging channel):
+- Open the report
+- Read the Executive Summary (2 minutes)
+- Review the Compliance Checklist (who does what, by when)
+- Share with your teams
+
+**That's it.** The system handles detection, extraction, analysis, and formatting.
+
+### What You Receive
+
+A compliance report containing:
+
+| Section | What's In It | Time to Read |
+|---------|-------------|-------------|
+| **Executive Summary** | What changed, why it matters | 2 minutes |
+| **Business Obligations** | What we must do, by when | 5 minutes |
+| **Compliance Checklist** | Action items with owners and deadlines | 5 minutes |
+| **Penalties** | What happens if we don't comply | 1 minute |
+| **Technical Implementation** | What engineering needs to build | Hand to engineering |
+| **FAQ** | Questions your team will ask | Share as-needed |
+
+### How to Ask Questions
+
+Once the system is set up, you can ask it anything in plain English:
+
+- *"What are the penalties if we miss the DPDP deadline?"*
+- *"What does the new SEBI circular mean for our marketing team?"*
+- *"Give me a 30-day action plan for the RBI notification"*
+- *"Which obligations apply to us as a data fiduciary?"*
+
+The system answers from the actual regulation text, not generic advice.
+
+### Adding New Regulatory Bodies
+
+Tell your IT team which bodies to monitor. The system supports:
+SEBI, AMFI, RBI, IRDAI, TRAI, DPDP Board, and any body with a web presence.
+
+Just say: *"Add IRDAI to the monitoring list"* — your IT team handles the rest.
+
+---
+
+## For Your IT Team
+
+### Prerequisites
+
+- Python 3.11+
+- Docker
+- Hermes Agent v0.14+ (`pip install hermes-agent`)
+- API key for an LLM provider (OpenAI, Anthropic, or OpenRouter)
+
+### One-Time Setup
 
 ```bash
-# 1. Install Hermes Agent
-pip install hermes-agent
+# Clone the repo
+git clone git@github.com:madan-quirkylabs/compliance-disco.git
+cd compliance-disco
 
-# 2. Run setup (creates profiles, configures cron, initializes workspace)
+# Run setup (creates Hermes profiles, configures cron, initializes workspace)
 ./setup.sh
 
-# 3. Fill in your API key
-vim ~/.hermes/.env   # or wherever your HERMES_HOME points
+# Fill in API key
+vim ~/.hermes/.env
 
-# 4. Install the gateway (required for cron to work)
+# Install the gateway (required for cron monitoring)
 hermes gateway install
 ```
 
-### Day-to-Day: Fully Automatic
-
-The monitor runs every 6 hours via cron. When it detects a new regulation,
-the full pipeline runs automatically:
+### How the Pipeline Works
 
 ```
-Monitor detects → Reader extracts → Coordinator dispatches
-  → Marketing writes guide + checklist
-  → Engineering writes technical plan
-  → Consolidator merges → final-report.md
+Cron (every 6 hours)
+  │
+  ▼
+Monitor detects new regulation on SEBI/AMFI/RBI
+  │
+  ▼
+Coordinator invokes (via delegate_task):
+  ├── Reader: extracts obligations, definitions, timelines, penalties
+  ├── Marketing: writes compliance guide, checklist, FAQ, blog post
+  ├── Engineering: writes data schemas, control architecture, implementation plan
+  └── Consolidator: merges everything into final-report.md
+  │
+  ▼
+Report delivered to CCO
 ```
 
-### Run Manually Anytime
+### Running Manually
 
 ```bash
-# Trigger the full pipeline
+# Full pipeline test (DPDP Act as example)
+python3 test_pipeline.py --clean --test-failures
+
+# Trigger via Hermes
 hermes "Run the compliance pipeline for the latest SEBI circular"
 
-# Or test with the simulation
-python3 test_pipeline.py --clean
-
-# Run with failure mode tests
-python3 test_pipeline.py --clean --test-failures
-```
-
-### On-Demand Analysis
-
-```bash
-# Ask about a specific regulation
-hermes "What are the penalties under the DPDP Act?"
-
-# Get the engineering perspective
-hermes "What technical controls do we need for the new RBI circular?"
-
-# Get the executive summary
-hermes "Give me the bottom line on the latest regulation"
-```
-
-### View the Dashboard
-
-```bash
-# Serve the dashboard locally
+# View the dashboard
 cd web && python3 -m http.server 8080
 # Open http://localhost:8080
 ```
 
-### Adding Regulatory Bodies
+### Architecture
 
-Edit `workspace/shared-data/monitored-sources/known-items.json`:
-```json
-{
-  "sources": {
-    "SEBI": { "last_checked": null, "items": [] },
-    "AMFI": { "last_checked": null, "items": [] },
-    "RBI": { "last_checked": null, "items": [] },
-    "IRDAI": { "last_checked": null, "items": [] },
-    "TRAI": { "last_checked": null, "items": [] }
-  }
-}
-```
+Six AI agents in a pipeline:
 
-## Architecture
+| Agent | Role | How It Runs |
+|-------|------|-------------|
+| **Monitor** | Watches regulatory sources | Cron job (every 6 hours) |
+| **Coordinator** | Orchestrates everything | Main Hermes session |
+| **Reader** | Extracts structured data | delegate_task subagent |
+| **Marketing** | Customer-facing content | delegate_task subagent |
+| **Engineering** | Technical artifacts | delegate_task subagent |
+| **Consolidator** | Merges final report | delegate_task subagent |
 
-Six AI agents working in a pipeline, orchestrated by the Coordinator using `delegate_task`:
+### Configuration
 
-```
-  ┌─────────────────────┐
-  │  Regulatory Monitor  │  ← Cron: every 6 hours, watches SEBI/AMFI/RBI
-  └──────────┬──────────┘
-             │ handoff
-             ▼
-  ┌─────────────────────┐
-  │    Coordinator       │  ← Single orchestrator, invokes all agents
-  └──┬──────┬──────┬───┘
-     │      │      │
-     ▼      ▼      ▼
-  Reader  Marketing  Engineering   ← delegate_task subagents
-     │      │      │
-     ▼      ▼      ▼
-  ┌─────────────────────┐
-  │    Consolidator      │  ← Merges all outputs → final-report.md
-  └─────────────────────┘
-```
+- **Add regulatory bodies:** Edit `workspace/shared-data/monitored-sources/known-items.json`
+- **Change monitoring frequency:** Edit the cron job in `~/.hermes/cron/jobs.json`
+- **Change LLM model:** Edit `agents/coordinator/config.yaml`
+- **View run history:** Check `workspace/shared-data/run-history/`
 
-The Coordinator is the single Hermes session that runs the full pipeline.
-Other agents are invoked as ephemeral subagents via `delegate_task`.
-
-## Testing
+### Testing
 
 ```bash
-# Full pipeline simulation with 192 assertions
+# 192 assertions, failure mode tests, observability logging
 python3 test_pipeline.py --clean --test-failures
 
-# Outputs:
-#   workspace/shared-data/extracted-regulations/  (5 files)
-#   workspace/shared-data/marketing-output/      (4 files)
-#   workspace/shared-data/engineering-output/    (4 files)
-#   workspace/shared-data/consolidated-output/   (final-report.md)
-#   workspace/shared-data/run-history/           (observability logs)
+# Outputs appear in workspace/shared-data/
 ```
+
+---
 
 ## Requirements
 
 - Hermes Agent v0.14+
-- API key for an LLM provider (OpenAI, Anthropic, etc.)
-- Docker (for unattended agent execution)
+- API key (OpenAI, Anthropic, or OpenRouter)
+- Docker
+- Python 3.11+
 
 ## License
 
-MIT — built for Hermes Buildathon 2026.
+MIT — Hermes Buildathon 2026.
