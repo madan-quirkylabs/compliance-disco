@@ -1,19 +1,17 @@
 # Hermes config for: regulatory-reader
 # Invoked by coordinator via delegate_task
-# Uses local ds4-server (DeepSeek V4 Flash) at http://127.0.0.1:8000
+# Backend: DeepSeek hosted API (V4 Flash)
 
 model:
   provider: custom
   default: deepseek-v4-flash
-  base_url: "http://172.17.0.1:8000/v1"
-  api_key: "ds4-local"
+  base_url: "https://api.deepseek.com/v1"
+  api_key: "YOUR_DEEPSEEK_API_KEY_HERE"
   context_length: 100000
 
 terminal:
   backend: docker
   docker_image: "nikolaik/python-nodejs:python3.11-nodejs20"
-  docker_extra_hosts:
-    - "host.docker.internal:host-gateway"
 
 agent:
   max_turns: 50

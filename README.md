@@ -72,7 +72,7 @@ Just say: *"Add IRDAI to the monitoring list"* — your IT team handles the rest
 - Python 3.11+
 - Docker
 - Hermes Agent v0.14+ (`pip install hermes-agent`)
-- [DwarfStar (ds4)](https://github.com/antirez/ds4) with DeepSeek V4 Flash model
+- [DeepSeek API key](https://platform.deepseek.com/api_keys) (V4 Flash)
 
 ### One-Time Setup
 
@@ -81,10 +81,7 @@ Just say: *"Add IRDAI to the monitoring list"* — your IT team handles the rest
 git clone git@github.com:madan-quirkylabs/compliance-disco.git
 cd compliance-disco
 
-# Start ds4-server (DeepSeek V4 Flash, local inference)
-./ds4-server --ctx 100000
-
-# In another terminal — run setup
+# Run setup (creates profiles, configures API, initializes workspace)
 ./setup.sh
 
 # Install the gateway (required for cron monitoring)
@@ -139,7 +136,7 @@ Six AI agents in a pipeline:
 
 ### Configuration
 
-- **LLM backend:** ds4-server at `http://127.0.0.1:8000` (DeepSeek V4 Flash)
+- **LLM backend:** DeepSeek V4 Flash (hosted API at `api.deepseek.com`)
 - **Add regulatory bodies:** Edit `workspace/shared-data/monitored-sources/known-items.json`
 - **Change monitoring frequency:** Edit the cron job in `~/.hermes/cron/jobs.json`
 - **Change LLM model:** Edit `agents/coordinator/config.yaml`
@@ -159,6 +156,6 @@ python3 test_pipeline.py --clean --test-failures
 ## Requirements
 
 - Hermes Agent v0.14+
-- [DwarfStar (ds4)](https://github.com/antirez/ds4) with DeepSeek V4 Flash
+- [DeepSeek API key](https://platform.deepseek.com/api_keys) (V4 Flash)
 - Docker
 - Python 3.11+

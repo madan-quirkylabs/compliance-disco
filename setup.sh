@@ -5,7 +5,7 @@ set -euo pipefail
 # Run from project root: ./setup.sh
 #
 # This creates Hermes profiles for each agent and configures cron monitoring.
-# Prerequisites: hermes-agent installed, API keys ready.
+# Prerequisites: hermes-agent installed, DeepSeek API key ready.
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$SCRIPT_DIR"
@@ -27,20 +27,21 @@ fi
 echo "Hermes version: $(hermes --version 2>/dev/null || echo 'unknown')"
 echo ""
 
-# ── Check ds4-server is running ──────────────────────────────────────
+# ── Get DeepSeek API key ─────────────────────────────────────────────
 
-echo "━━━ Checking ds4-server ━━━"
-DS4_HOST="${DS4_HOST:-172.17.0.1}"
-DS4_PORT="${DS4_PORT:-8000}"
-if curl -sf "http://${DS4_HOST}:${DS4_PORT}/v1/models" >/dev/null 2>&1; then
-  echo "  ✓ ds4-server reachable at http://${DS4_HOST}:${DS4_PORT}"
-  DS4_MODEL=$(curl -sf "http://${DS4_HOST}:${DS4_PORT}/v1/models" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data'][0]['id'])" 2>/dev/null || echo "deepseek-v4-flash")
-  echo "  ✓ Detected model: $DS4_MODEL"
+if [[ -n "${DEEPSEEK_API_KEY:-}" ]]; then
+  echo "━━━ Using DEEPSEEK_API_KEY from environment ━━━"
 else
-  echo "  ⚠  ds4-server not reachable at http://${DS4_HOST}:${DS4_PORT}"
-  echo "     Start it first:  ./ds4-server --ctx 100000"
-  echo "     Continuing setup anyway (config will point to ds4-server)..."
+  echo "━━━ DeepSeek API Key ━━━"
+  echo "  Get your key at: https://platform.deepseek.com/api_keys"
+  echo ""
+  read -rp "  Enter your DeepSeek API key: " DEEPSEEK_API_KEY
+  if [[ -z "$DEEPSEEK_API_KEY" ]]; then
+    echo "ERROR: API key is required"
+    exit 1
+  fi
 fi
+echo "  ✓ API key configured"
 echo ""
 
 # ── Create profiles using hermes profile create ──────────────────────
@@ -56,11 +57,9 @@ else
   echo "  ℹ Profile 'coordinator' may already exist"
 fi
 
-# Set up coordinator's HERMES_HOME
-COORD_HOME="${HERMES_HOME:-$HOME/.hermes}"
-if [[ -d "$HOME/.hermes-coordinator" ]]; then
-  COORD_HOME="$HOME/.hermes-coordinator"
-fi
+# Set up coordinator's HERMES_HOME (profile directory)
+COORD_HOME="$HOME/.hermes/profiles/coordinator"
+mkdir -p "$COORD_HOME"
 
 echo ""
 echo "━━━ Creating Monitor Profile ━━━"
@@ -102,21 +101,18 @@ echo ""
 
 cat > "$COORD_HOME/config.yaml" << EOF
 # Compliance-Disco — Coordinator Config
-# Backend: ds4-server (DeepSeek V4 Flash) at http://${DS4_HOST}:${DS4_PORT}
+# Backend: DeepSeek hosted API (V4 Flash)
 
 model:
   provider: custom
-  default: ${DS4_MODEL:-deepseek-v4-flash}
-  base_url: "http://${DS4_HOST}:${DS4_PORT}/v1"
-  api_key: "ds4-local"
+  default: deepseek-v4-flash
+  base_url: "https://api.deepseek.com/v1"
+  api_key: "${DEEPSEEK_API_KEY}"
   context_length: 100000
 
 terminal:
   backend: docker
   docker_image: "nikolaik/python-nodejs:python3.11-nodejs20"
-  docker_network: true
-  docker_extra_hosts:
-    - "host.docker.internal:host-gateway"
   docker_volumes:
     - "/workspace"
 
@@ -140,18 +136,13 @@ cron:
 EOF
 echo "Generated config.yaml → $COORD_HOME/config.yaml"
 
-# ── Generate .env template ───────────────────────────────────────────
+# ── Generate .env ────────────────────────────────────────────────────
 
-if [[ ! -f "$COORD_HOME/.env" ]]; then
-  cat > "$COORD_HOME/.env" << EOF
-# ds4-server backend (no API keys needed for local inference)
-DS4_HOST=${DS4_HOST:-172.17.0.1}
-DS4_PORT=${DS4_PORT:-8000}
+cat > "$COORD_HOME/.env" << EOF
+# DeepSeek API key
+DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
 EOF
-  echo "Created .env → $COORD_HOME/.env"
-else
-  echo "ℹ .env already exists, skipping"
-fi
+echo "Created .env → $COORD_HOME/.env"
 
 echo ""
 
@@ -217,14 +208,13 @@ echo "║   Setup Complete ✓                                ║"
 echo "╚═══════════════════════════════════════════════════╝"
 echo ""
 echo "Next steps:"
-echo "  1. Start ds4-server (if not already running):"
-echo "       ./ds4-server --ctx 100000 --port ${DS4_PORT:-8000}"
-echo "  2. Install the gateway (required for cron):"
+echo "  1. Install the gateway (required for cron):"
 echo "       hermes gateway install"
-echo "  3. Test the pipeline manually:"
+echo "  2. Test the pipeline manually:"
 echo "       cd $PROJECT_ROOT"
-echo "       hermes 'Read workspace/shared-data/handoffs/monitor-to-coordinator.md and run the full compliance pipeline'"
-echo "  4. Or run the test simulation:"
+echo "       hermes profile use coordinator"
+echo "       hermes -z 'Read workspace/shared-data/handoffs/monitor-to-coordinator.md and run the full compliance pipeline'"
+echo "  3. Or run the test simulation:"
 echo "       python3 test_pipeline.py --clean"
 echo ""
 echo "Cron schedule:"
