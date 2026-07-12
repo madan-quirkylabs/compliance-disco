@@ -1,0 +1,9 @@
+# Hermes runtime profiles (created by setup.sh; contain .env secrets)
+agents/*/.hermes/
+
+# Local env / secrets
+.env
+*.env
+
+# OS cruft
+.DS_Store
