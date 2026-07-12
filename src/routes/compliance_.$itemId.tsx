@@ -168,10 +168,12 @@ function ItemDetailPage() {
       itemId: item.id,
       actor: who,
       action: "Approved",
-      summary: "Signed off on all department assessments.",
+      summary: `Signed off ${item.id} — ${item.impacts
+        .map((im) => departmentLabel[im.department])
+        .join(" and ")} assessment${item.impacts.length > 1 ? "s" : ""}.`,
     });
     invalidate();
-    toast.success("Approved and signed off");
+    toast.success(`Approved and signed off ${item.id}`);
   };
   const requestChanges = async () => {
     const who = actorName(mode);
