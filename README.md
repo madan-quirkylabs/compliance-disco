@@ -81,6 +81,9 @@ Just say: *"Add IRDAI to the monitoring list"* — your IT team handles the rest
 git clone git@github.com:madan-quirkylabs/compliance-disco.git
 cd compliance-disco
 
+# Set your DeepSeek API key (or enter it when prompted)
+export DEEPSEEK_API_KEY="sk-your-key-here"
+
 # Run setup (creates profiles, configures API, initializes workspace)
 ./setup.sh
 
@@ -110,11 +113,12 @@ Report delivered to CCO
 ### Running Manually
 
 ```bash
-# Full pipeline test (DPDP Act as example)
+# Full pipeline test (DPDP Act as example, 188 assertions)
 python3 test_pipeline.py --clean --test-failures
 
-# Trigger via Hermes
-hermes "Run the compliance pipeline for the latest SEBI circular"
+# Trigger the real pipeline via Hermes
+hermes profile use coordinator
+hermes -z "Run the compliance pipeline for the latest SEBI circular"
 
 # View the dashboard
 cd web && python3 -m http.server 8080
@@ -145,7 +149,7 @@ Six AI agents in a pipeline:
 ### Testing
 
 ```bash
-# 192 assertions, failure mode tests, observability logging
+# 188 assertions, failure mode tests, observability logging
 python3 test_pipeline.py --clean --test-failures
 
 # Outputs appear in workspace/shared-data/
