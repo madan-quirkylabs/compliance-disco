@@ -9,20 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as RunsRouteImport } from './routes/runs'
 import { Route as FdoRouteImport } from './routes/fdo'
 import { Route as ComplianceRouteImport } from './routes/compliance'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RunsRunIdRouteImport } from './routes/runs_.$runId'
 import { Route as DepartmentsDeptRouteImport } from './routes/departments.$dept'
 import { Route as ComplianceItemIdRouteImport } from './routes/compliance_.$itemId'
 
-const WelcomeRoute = WelcomeRouteImport.update({
-  id: '/welcome',
-  path: '/welcome',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RunsRoute = RunsRouteImport.update({
   id: '/runs',
   path: '/runs',
@@ -36,6 +31,11 @@ const FdoRoute = FdoRouteImport.update({
 const ComplianceRoute = ComplianceRouteImport.update({
   id: '/compliance',
   path: '/compliance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -61,20 +61,20 @@ const ComplianceItemIdRoute = ComplianceItemIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
   '/compliance': typeof ComplianceRoute
   '/fdo': typeof FdoRoute
   '/runs': typeof RunsRoute
-  '/welcome': typeof WelcomeRoute
   '/compliance/$itemId': typeof ComplianceItemIdRoute
   '/departments/$dept': typeof DepartmentsDeptRoute
   '/runs/$runId': typeof RunsRunIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
   '/compliance': typeof ComplianceRoute
   '/fdo': typeof FdoRoute
   '/runs': typeof RunsRoute
-  '/welcome': typeof WelcomeRoute
   '/compliance/$itemId': typeof ComplianceItemIdRoute
   '/departments/$dept': typeof DepartmentsDeptRoute
   '/runs/$runId': typeof RunsRunIdRoute
@@ -82,10 +82,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
   '/compliance': typeof ComplianceRoute
   '/fdo': typeof FdoRoute
   '/runs': typeof RunsRoute
-  '/welcome': typeof WelcomeRoute
   '/compliance_/$itemId': typeof ComplianceItemIdRoute
   '/departments/$dept': typeof DepartmentsDeptRoute
   '/runs_/$runId': typeof RunsRunIdRoute
@@ -94,30 +94,30 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/app'
     | '/compliance'
     | '/fdo'
     | '/runs'
-    | '/welcome'
     | '/compliance/$itemId'
     | '/departments/$dept'
     | '/runs/$runId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/app'
     | '/compliance'
     | '/fdo'
     | '/runs'
-    | '/welcome'
     | '/compliance/$itemId'
     | '/departments/$dept'
     | '/runs/$runId'
   id:
     | '__root__'
     | '/'
+    | '/app'
     | '/compliance'
     | '/fdo'
     | '/runs'
-    | '/welcome'
     | '/compliance_/$itemId'
     | '/departments/$dept'
     | '/runs_/$runId'
@@ -125,10 +125,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRoute
   ComplianceRoute: typeof ComplianceRoute
   FdoRoute: typeof FdoRoute
   RunsRoute: typeof RunsRoute
-  WelcomeRoute: typeof WelcomeRoute
   ComplianceItemIdRoute: typeof ComplianceItemIdRoute
   DepartmentsDeptRoute: typeof DepartmentsDeptRoute
   RunsRunIdRoute: typeof RunsRunIdRoute
@@ -136,13 +136,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/welcome': {
-      id: '/welcome'
-      path: '/welcome'
-      fullPath: '/welcome'
-      preLoaderRoute: typeof WelcomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/runs': {
       id: '/runs'
       path: '/runs'
@@ -162,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/compliance'
       fullPath: '/compliance'
       preLoaderRoute: typeof ComplianceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -197,10 +197,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRoute,
   ComplianceRoute: ComplianceRoute,
   FdoRoute: FdoRoute,
   RunsRoute: RunsRoute,
-  WelcomeRoute: WelcomeRoute,
   ComplianceItemIdRoute: ComplianceItemIdRoute,
   DepartmentsDeptRoute: DepartmentsDeptRoute,
   RunsRunIdRoute: RunsRunIdRoute,

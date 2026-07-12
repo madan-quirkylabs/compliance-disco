@@ -127,7 +127,7 @@ function RootComponent() {
 
   // The marketing page is public-facing and renders its own chrome, so it opts
   // out of the dashboard shell (sidebar, stakeholder switcher, regulation bar).
-  const isMarketing = pathname === "/welcome";
+  const isMarketing = pathname === "/";
 
   return (
     <QueryClientProvider client={queryClient}>
