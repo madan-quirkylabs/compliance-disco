@@ -194,6 +194,20 @@ cd web && python3 -m http.server 8080
 
 ### Live Demo Server
 
+**Option A: serve.py (no dependencies, stdlib only)**
+```bash
+# Start the server
+python serve.py
+# Open http://localhost:8000
+
+# Features:
+#   - Upload regulation PDFs
+#   - Run full pipeline from browser
+#   - View archived reports
+#   - Real-time status updates
+```
+
+**Option B: server.py (FastAPI, more features)**
 ```bash
 # Install dependencies
 pip install -r requirements.txt
@@ -209,6 +223,8 @@ python server.py
 #   GET  /api/report    — Get final report
 #   GET  /api/handoffs  — View all handoffs
 ```
+
+**Railway Deployment:** Uses `serve.py` (no pip install needed)
 
 ### Architecture
 
